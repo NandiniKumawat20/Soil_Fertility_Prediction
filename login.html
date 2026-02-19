@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Register - Soil Fertility Prediction</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #22c55e;
+            --secondary-color: #3b82f6;
+            --accent-color: #f59e0b;
+            --dark-bg: #0f172a;
+            --light-bg: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+            --error-color: #ef4444;
+            --success-color: #22c55e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .auth-form-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.5s ease;
+        }
+
+        .auth-info {
+            padding: 2rem;
+        }
+
+        .auth-info h2 {
+            font-size: 2.5rem;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .auth-info p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .auth-features {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .auth-feature {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .auth-feature i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            flex-shrink: 0;
+        }
+
+        .auth-feature h3 {
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-feature p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-header h1 {
+            font-size: 2rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: var(--text-light);
+        }
+
+        .form-toggle {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: var(--light-bg);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .form-toggle button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .form-toggle button.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="tel"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+        }
+
+        input:invalid:focus {
+            border-color: var(--error-color);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .checkbox-group a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .checkbox-group a:hover {
+            text-decoration: underline;
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .form-submit:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3);
+        }
+
+        .form-submit:active {
+            transform: translateY(0);
+        }
+
+        .form-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            color: var(--text-light);
+        }
+
+        .form-divider::before,
+        .form-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .social-login {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .social-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        .social-btn i {
+            font-size: 1.1rem;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-light);
+        }
+
+        .form-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        input.error {
+            border-color: var(--error-color) !important;
+        }
+
+        .success-message {
+            background: #f0fdf4;
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: var(--text-light);
+            margin: 1rem 0;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(34, 197, 94, 0.3);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .back-to-home {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-to-home:hover {
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-info {
+                display: none;
+            }
+
+            .auth-form-container {
+                padding: 2rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .social-login {
+                grid-template-columns: 1fr;
+            }
+
+            .back-to-home {
+                position: static;
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .auth-form-container {
+                padding: 1.5rem;
+            }
+
+            .form-header h1 {
+                font-size: 1.5rem;
+            }
+
+            input[type="text"],
+            input[type="email"],
+            input[type="password"],
+            input[type="tel"],
+            select {
+                padding: 10px 10px 10px 36px;
+                font-size: 16px;
+            }
+
+            .input-icon {
+                left: 10px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-to-home">
+        <i class="fas fa-arrow-left"></i>
+        Back to Home
+    </a>
+
+    <div class="auth-container">
+        <!-- Auth Info Section -->
+        <div class="auth-info">
+            <h2>Join Our Farming Community</h2>
+            <p>Unlock the power of data-driven agriculture with our advanced soil fertility prediction system.</p>
+            
+            <div class="auth-features">
+                <div class="auth-feature">
+                    <i class="fas fa-chart-line"></i>
+                    <div>
+                        <h3>Real-Time Analytics</h3>
+                        <p>Get instant soil fertility analysis and actionable insights for your fields.</p>
+                    </div>
+                </div>
+
+                <div class="auth-feature">
+                    <i class="fas fa-globe"></i>
+                    <div>
+                        <h3>Global Community</h3>
+                        <p>Connect with farmers worldwide and share best practices.</p>
+                    </div>
+                </div>
+
+                <div class="auth-feature">
+                    <i class="fas fa-lock"></i>
+                    <div>
+                        <h3>Secure & Private</h3>
+                        <p>Your data is encrypted and protected with industry-standard security.</p>
+                    </div>
+                </div>
+
+                <div class="auth-feature">
+                    <i class="fas fa-headset"></i>
+                    <div>
+                        <h3>24/7 Support</h3>
+                        <p>Expert support team available around the clock to help you.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auth Form Section -->
+        <div class="auth-form-container">
+            <div class="form-header">
+                <h1>Welcome</h1>
+                <p>Access your soil fertility insights</p>
+            </div>
+
+            <!-- Form Toggle -->
+            <div class="form-toggle">
+                <button class="toggle-btn active" data-form="login">Login</button>
+                <button class="toggle-btn" data-form="register">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="form-section active">
+                <div class="success-message" id="loginSuccess">
+                    <i class="fas fa-check-circle"></i> Login successful! Redirecting...
+                </div>
+
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" id="loginEmail" name="email" placeholder="your@email.com" required>
+                    </div>
+                    <div class="error-message" id="loginEmailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>
+                    </div>
+                    <div class="error-message" id="loginPasswordError"></div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="rememberMe" name="rememberMe">
+                    <label for="rememberMe">Remember me</label>
+                </div>
+
+                <div class="loading" id="loginLoading">
+                    <span class="spinner"></span>
+                    Logging in...
+                </div>
+
+                <button type="submit" class="form-submit">Login to Account</button>
+
+                <div class="form-footer">
+                    Don't have an account? <a href="#register" class="toggle-btn" data-form="register">Register here</a>
+                    <br>
+                    <a href="#">Forgot password?</a>
+                </div>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="form-section">
+                <div class="success-message" id="registerSuccess">
+                    <i class="fas fa-check-circle"></i> Registration successful! Redirecting to login...
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="firstName" name="firstName" placeholder="John" required>
+                        </div>
+                        <div class="error-message" id="firstNameError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="lastName" name="lastName" placeholder="Doe" required>
+                        </div>
+                        <div class="error-message" id="lastNameError"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerEmail">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" id="registerEmail" name="email" placeholder="your@email.com" required>
+                    </div>
+                    <div class="error-message" id="registerEmailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="farmName">Farm Name (Optional)</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-leaf input-icon"></i>
+                        <input type="text" id="farmName" name="farmName" placeholder="Your Farm Name">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-globe input-icon"></i>
+                            <select id="country" name="country" required>
+                                <option value="">Select Country</option>
+                                <option value="usa">United States</option>
+                                <option value="india">India</option>
+                                <option value="brazil">Brazil</option>
+                                <option value="canada">Canada</option>
+                                <option value="australia">Australia</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="error-message" id="countryError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number (Optional)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-phone input-icon"></i>
+                            <input type="tel" id="phone" name="phone" placeholder="+1 (555) 000-0000">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="registerPassword" name="password" placeholder="Create a strong password" required>
+                    </div>
+                    <div class="error-message" id="registerPasswordError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                    </div>
+                    <div class="error-message" id="confirmPasswordError"></div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                    <label for="agreeTerms">I agree to the <a href="#">Terms and Conditions</a> and <a href="#">Privacy Policy</a></label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="agreeNewsletter" name="agreeNewsletter">
+                    <label for="agreeNewsletter">Subscribe to our newsletter for farming tips and updates</label>
+                </div>
+
+                <div class="loading" id="registerLoading">
+                    <span class="spinner"></span>
+                    Creating account...
+                </div>
+
+                <button type="submit" class="form-submit">Create Account</button>
+
+                <div class="form-footer">
+                    Already have an account? <a href="#login" class="toggle-btn" data-form="login">Login here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Form Toggle
+        const toggleBtns = document.querySelectorAll('.toggle-btn');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const form = btn.getAttribute('data-form');
+
+                // Update buttons
+                document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll(`[data-form="${form}"]`).forEach(b => b.classList.add('active'));
+
+                // Update forms
+                document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+                if (form === 'login') {
+                    loginForm.classList.add('active');
+                } else {
+                    registerForm.classList.add('active');
+                }
+            });
+        });
+
+        // Login Form Submission
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Validate
+            let isValid = true;
+
+            if (!email) {
+                showError('loginEmailError', 'Email is required');
+                isValid = false;
+            } else if (!isValidEmail(email)) {
+                showError('loginEmailError', 'Please enter a valid email');
+                isValid = false;
+            } else {
+                clearError('loginEmailError');
+            }
+
+            if (!password) {
+                showError('loginPasswordError', 'Password is required');
+                isValid = false;
+            } else if (password.length < 6) {
+                showError('loginPasswordError', 'Password must be at least 6 characters');
+                isValid = false;
+            } else {
+                clearError('loginPasswordError');
+            }
+
+            if (isValid) {
+                simulateLogin();
+            }
+        });
+
+        // Register Form Submission
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const country = document.getElementById('country').value;
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+
+            let isValid = true;
+
+            // First Name
+            if (!firstName) {
+                showError('firstNameError', 'First name is required');
+                isValid = false;
+            } else {
+                clearError('firstNameError');
+            }
+
+            // Last Name
+            if (!lastName) {
+                showError('lastNameError', 'Last name is required');
+                isValid = false;
+            } else {
+                clearError('lastNameError');
+            }
+
+            // Email
+            if (!email) {
+                showError('registerEmailError', 'Email is required');
+                isValid = false;
+            } else if (!isValidEmail(email)) {
+                showError('registerEmailError', 'Please enter a valid email');
+                isValid = false;
+            } else {
+                clearError('registerEmailError');
+            }
+
+            // Country
+            if (!country) {
+                showError('countryError', 'Please select a country');
+                isValid = false;
+            } else {
+                clearError('countryError');
+            }
+
+            // Password
+            if (!password) {
+                showError('registerPasswordError', 'Password is required');
+                isValid = false;
+            } else if (password.length < 8) {
+                showError('registerPasswordError', 'Password must be at least 8 characters');
+                isValid = false;
+            } else {
+                clearError('registerPasswordError');
+            }
+
+            // Confirm Password
+            if (password !== confirmPassword) {
+                showError('confirmPasswordError', 'Passwords do not match');
+                isValid = false;
+            } else {
+                clearError('confirmPasswordError');
+            }
+
+            // Terms
+            if (!agreeTerms) {
+                alert('Please agree to the Terms and Conditions');
+                isValid = false;
+            }
+
+            if (isValid) {
+                simulateRegister();
+            }
+        });
+
+        // Helper Functions
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function showError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            const inputField = errorEl.previousElementSibling?.querySelector('input') || errorEl.previousElementSibling?.querySelector('select');
+            
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+            if (inputField) {
+                inputField.classList.add('error');
+            }
+        }
+
+        function clearError(elementId) {
+            const errorEl = document.getElementById(elementId);
+            const inputField = errorEl.previousElementSibling?.querySelector('input') || errorEl.previousElementSibling?.querySelector('select');
+            
+            errorEl.classList.remove('show');
+            if (inputField) {
+                inputField.classList.remove('error');
+            }
+        }
+
+        function simulateLogin() {
+            const loginLoading = document.getElementById('loginLoading');
+            const loginSuccess = document.getElementById('loginSuccess');
+            const submitBtn = loginForm.querySelector('.form-submit');
+
+            loginLoading.classList.add('show');
+            submitBtn.disabled = true;
+
+            setTimeout(() => {
+                loginLoading.classList.remove('show');
+                loginSuccess.classList.add('show');
+
+                setTimeout(() => {
+                    alert('Login successful! In a real application, you would be redirected to the dashboard.');
+                    loginForm.reset();
+                    loginSuccess.classList.remove('show');
+                    submitBtn.disabled = false;
+                }, 1500);
+            }, 2000);
+        }
+
+        function simulateRegister() {
+            const registerLoading = document.getElementById('registerLoading');
+            const registerSuccess = document.getElementById('registerSuccess');
+            const submitBtn = registerForm.querySelector('.form-submit');
+
+            registerLoading.classList.add('show');
+            submitBtn.disabled = true;
+
+            setTimeout(() => {
+                registerLoading.classList.remove('show');
+                registerSuccess.classList.add('show');
+
+                setTimeout(() => {
+                    alert('Registration successful! Please check your email to verify your account.');
+                    registerForm.reset();
+                    registerSuccess.classList.remove('show');
+                    submitBtn.disabled = false;
+
+                    // Switch to login form
+                    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('[data-form="login"]').forEach(b => b.classList.add('active'));
+                    document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+                    loginForm.classList.add('active');
+                }, 1500);
+            }, 2000);
+        }
+
+        // Smooth scroll to form on hash change
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash.slice(1);
+            if (hash === 'register') {
+                document.querySelector('[data-form="register"]').click();
+            } else if (hash === 'login') {
+                document.querySelector('[data-form="login"]').click();
+            }
+        });
+
+        // Check initial hash
+        if (window.location.hash === '#register') {
+            document.querySelector('[data-form="register"]').click();
+        }
+    </script>
+</body>
+</html>
