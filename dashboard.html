@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Dashboard - Soil Fertility Prediction</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .dashboard-main {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-topbar {
+            display: flex;
+            justify-content: flex-end;
+            padding: 1.5rem 2rem;
+        }
+
+        .profile-chip {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            max-width: 340px;
+        }
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dcfce7;
+            color: #166534;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .profile-info {
+            min-width: 0;
+        }
+
+        .profile-name {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .profile-role {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            line-height: 1.2;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dashboard-center {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .dashboard-center h1 {
+            font-size: 2.5rem;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .dashboard-center p {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            max-width: 560px;
+        }
+
+        .analysis-btn {
+            min-width: 220px;
+            justify-content: center;
+            font-size: 1.05rem;
+        }
+
+        @media (max-width: 640px) {
+            .dashboard-topbar {
+                padding: 1rem;
+            }
+
+            .profile-chip {
+                max-width: 100%;
+            }
+
+            .dashboard-center h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="dashboard-main">
+        <div class="dashboard-topbar">
+            <div class="profile-chip" id="profileChip">
+                <div class="profile-icon"><i class="fas fa-user"></i></div>
+                <div class="profile-info">
+                    <div class="profile-name" id="profileName">User</div>
+                    <div class="profile-role" id="profileRole">Farmer</div>
+                </div>
+            </div>
+        </div>
+
+        <section class="dashboard-center">
+            <h1>Main Dashboard</h1>
+            <p>Welcome to your soil fertility workspace. Start by running an analysis to get insights and recommendations.</p>
+            <button class="btn btn-primary analysis-btn" id="doAnalysisBtn">
+                <i class="fas fa-flask"></i>
+                Do Analysis
+            </button>
+        </section>
+    </main>
+
+    <script>
+        const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+        const firstName = profile.firstName || 'User';
+        const lastName = profile.lastName || '';
+        const fullName = `${firstName} ${lastName}`.trim();
+        const occupation = profile.occupation || 'Farmer';
+
+        document.getElementById('profileName').textContent = fullName;
+        document.getElementById('profileRole').textContent = occupation;
+
+        document.getElementById('doAnalysisBtn').addEventListener('click', () => {
+            window.location.href = 'analysis.html';
+        });
+    </script>
+</body>
+</html>
+

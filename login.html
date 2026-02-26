@@ -613,12 +613,20 @@
                     </div>
                     <div class="error-message" id="registerEmailError"></div>
                 </div>
-
                 <div class="form-group">
-                    <label for="farmName">Farm Name (Optional)</label>
+                    <label for="occupation">Occupation</label>
                     <div class="input-wrapper">
-                        <i class="fas fa-leaf input-icon"></i>
-                        <input type="text" id="farmName" name="farmName" placeholder="Your Farm Name">
+                        <i class="fas fa-briefcase input-icon"></i>
+                        <select id="occupation" name="occupation" required>
+                            <option value="">Select Occupation</option>
+                            <option value="farmer">Farmers</option>
+                            <option value="agricultural-inspector">Agricultural Inspectors</option>
+                            <option value="agronomist">Agronomists</option>
+                            <option value="farm-manager">Farm Managers</option>
+                            <option value="agricultural-engineer">Agricultural Engineers</option>
+                            <option value="soil-scientist">Soil Scientists</option>
+                            <option value="horticulturist">Horticulturists</option>
+                        </select>
                     </div>
                 </div>
 
@@ -868,10 +876,20 @@
                 loginSuccess.classList.add('show');
 
                 setTimeout(() => {
-                    alert('Login successful! In a real application, you would be redirected to the dashboard.');
+                    const existingProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+                    const loginEmail = document.getElementById('loginEmail').value;
+
+                    localStorage.setItem('userProfile', JSON.stringify({
+                        firstName: existingProfile.firstName || 'User',
+                        lastName: existingProfile.lastName || '',
+                        email: loginEmail,
+                        occupation: existingProfile.occupation || 'Farmer'
+                    }));
+
                     loginForm.reset();
                     loginSuccess.classList.remove('show');
                     submitBtn.disabled = false;
+                    window.location.href = 'dashboard.html';
                 }, 1500);
             }, 2000);
         }
@@ -889,16 +907,19 @@
                 registerSuccess.classList.add('show');
 
                 setTimeout(() => {
-                    alert('Registration successful! Please check your email to verify your account.');
+                    const occupation = document.getElementById('occupation').value;
+
+                    localStorage.setItem('userProfile', JSON.stringify({
+                        firstName,
+                        lastName,
+                        email,
+                        occupation
+                    }));
+
                     registerForm.reset();
                     registerSuccess.classList.remove('show');
                     submitBtn.disabled = false;
-
-                    // Switch to login form
-                    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-                    document.querySelectorAll('[data-form="login"]').forEach(b => b.classList.add('active'));
-                    document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
-                    loginForm.classList.add('active');
+                    window.location.href = 'dashboard.html';
                 }, 1500);
             }, 2000);
         }
@@ -920,3 +941,5 @@
     </script>
 </body>
 </html>
+
+

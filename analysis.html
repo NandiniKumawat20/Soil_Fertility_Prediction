@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soil Analysis - Soil Fertility Prediction</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .analysis-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+            padding: 2rem 1rem;
+        }
+
+        .analysis-card {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            padding: 2rem;
+        }
+
+        .analysis-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .analysis-top h1 {
+            font-size: 1.8rem;
+            color: var(--text-dark);
+        }
+
+        .back-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .field-item label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .field-item input {
+            width: 100%;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.7rem 0.75rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .field-item input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+        }
+
+        .analysis-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .result-box {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--secondary-color);
+            background: #f0f9ff;
+            color: var(--text-dark);
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        @media (max-width: 992px) {
+            .feature-grid {
+                grid-template-columns: repeat(3, minmax(120px, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .analysis-card {
+                padding: 1.2rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: repeat(2, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="analysis-page">
+        <section class="analysis-card">
+            <div class="analysis-top">
+                <h1>Soil Analysis Input</h1>
+                <a href="dashboard.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+            </div>
+
+            <p>Enter the soil test values to run analysis.</p>
+
+            <form id="analysisForm">
+                <div class="feature-grid">
+                    <div class="field-item"><label for="n">N</label><input type="number" id="n" name="n" step="any" required></div>
+                    <div class="field-item"><label for="p">P</label><input type="number" id="p" name="p" step="any" required></div>
+                    <div class="field-item"><label for="k">K</label><input type="number" id="k" name="k" step="any" required></div>
+                    <div class="field-item"><label for="ph">pH</label><input type="number" id="ph" name="ph" step="any" required></div>
+                    <div class="field-item"><label for="ec">EC</label><input type="number" id="ec" name="ec" step="any" required></div>
+                    <div class="field-item"><label for="oc">OC</label><input type="number" id="oc" name="oc" step="any" required></div>
+                    <div class="field-item"><label for="s">S</label><input type="number" id="s" name="s" step="any" required></div>
+                    <div class="field-item"><label for="zn">Zn</label><input type="number" id="zn" name="zn" step="any" required></div>
+                    <div class="field-item"><label for="fe">Fe</label><input type="number" id="fe" name="fe" step="any" required></div>
+                    <div class="field-item"><label for="cu">Cu</label><input type="number" id="cu" name="cu" step="any" required></div>
+                    <div class="field-item"><label for="mn">Mn</label><input type="number" id="mn" name="mn" step="any" required></div>
+                    <div class="field-item"><label for="b">B</label><input type="number" id="b" name="b" step="any" required></div>
+                </div>
+
+                <div class="analysis-actions">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-flask"></i> Do Analysis</button>
+                    <button type="reset" class="btn btn-secondary">Reset</button>
+                </div>
+            </form>
+
+            <div class="result-box" id="analysisResult"></div>
+        </section>
+    </main>
+
+    <script>
+        const analysisForm = document.getElementById('analysisForm');
+        const resultBox = document.getElementById('analysisResult');
+
+        analysisForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(analysisForm);
+            const values = Object.fromEntries(formData.entries());
+            localStorage.setItem('lastAnalysisInput', JSON.stringify(values));
+
+            resultBox.textContent = 'Input captured successfully. Connect this page to your prediction model/API to generate analysis output.';
+            resultBox.classList.add('show');
+        });
+    </script>
+</body>
+</html>
+
+
