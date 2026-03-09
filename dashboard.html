@@ -30,6 +30,7 @@
             align-items: center;
             gap: 0.75rem;
             max-width: 340px;
+            cursor: pointer;
         }
 
         .profile-icon {
@@ -96,6 +97,67 @@
             font-size: 1.05rem;
         }
 
+        .profile-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 2000;
+        }
+
+        .profile-modal.show {
+            display: flex;
+        }
+
+        .profile-modal-card {
+            width: min(520px, 100%);
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: var(--shadow-lg);
+            padding: 1.2rem;
+        }
+
+        .profile-modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .profile-modal-head h3 {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+        }
+
+        .modal-close {
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .profile-details {
+            display: grid;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .profile-row {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.55rem 0.7rem;
+        }
+
+        .profile-row strong {
+            color: var(--text-dark);
+        }
+
         @media (max-width: 640px) {
             .dashboard-topbar {
                 padding: 1rem;
@@ -114,7 +176,7 @@
 <body>
     <main class="dashboard-main">
         <div class="dashboard-topbar">
-            <div class="profile-chip" id="profileChip">
+            <div class="profile-chip" id="profileChip" role="button" tabindex="0" aria-label="Open user details">
                 <div class="profile-icon"><i class="fas fa-user"></i></div>
                 <div class="profile-info">
                     <div class="profile-name" id="profileName">User</div>
@@ -133,18 +195,73 @@
         </section>
     </main>
 
+    <div class="profile-modal" id="profileModal" aria-hidden="true">
+        <div class="profile-modal-card">
+            <div class="profile-modal-head">
+                <h3><i class="fas fa-id-card"></i> Registered User Details</h3>
+                <button class="modal-close" id="closeProfileModal" aria-label="Close user details">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="profile-details">
+                <div class="profile-row"><strong>Name:</strong> <span id="detailName">-</span></div>
+                <div class="profile-row"><strong>Email:</strong> <span id="detailEmail">-</span></div>
+                <div class="profile-row"><strong>Occupation:</strong> <span id="detailOccupation">-</span></div>
+                <div class="profile-row"><strong>Country:</strong> <span id="detailCountry">-</span></div>
+                <div class="profile-row"><strong>Phone:</strong> <span id="detailPhone">-</span></div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
         const firstName = profile.firstName || 'User';
         const lastName = profile.lastName || '';
         const fullName = `${firstName} ${lastName}`.trim();
         const occupation = profile.occupation || 'Farmer';
+        const email = profile.email || 'Not provided';
+        const country = profile.country || 'Not provided';
+        const phone = profile.phone || 'Not provided';
 
         document.getElementById('profileName').textContent = fullName;
         document.getElementById('profileRole').textContent = occupation;
+        document.getElementById('detailName').textContent = fullName;
+        document.getElementById('detailEmail').textContent = email;
+        document.getElementById('detailOccupation').textContent = occupation;
+        document.getElementById('detailCountry').textContent = country;
+        document.getElementById('detailPhone').textContent = phone;
 
         document.getElementById('doAnalysisBtn').addEventListener('click', () => {
             window.location.href = 'analysis.html';
+        });
+
+        const profileChip = document.getElementById('profileChip');
+        const profileModal = document.getElementById('profileModal');
+        const closeProfileModal = document.getElementById('closeProfileModal');
+
+        const openModal = () => {
+            profileModal.classList.add('show');
+            profileModal.setAttribute('aria-hidden', 'false');
+        };
+
+        const closeModal = () => {
+            profileModal.classList.remove('show');
+            profileModal.setAttribute('aria-hidden', 'true');
+        };
+
+        profileChip.addEventListener('click', openModal);
+        profileChip.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openModal();
+            }
+        });
+
+        closeProfileModal.addEventListener('click', closeModal);
+        profileModal.addEventListener('click', (e) => {
+            if (e.target === profileModal) {
+                closeModal();
+            }
         });
     </script>
 </body>

@@ -832,7 +832,16 @@
             }
 
             if (isValid) {
-                simulateRegister();
+                const occupation = document.getElementById('occupation').value;
+                const phone = document.getElementById('phone').value.trim();
+                simulateRegister({
+                    firstName,
+                    lastName,
+                    email,
+                    occupation,
+                    country,
+                    phone
+                });
             }
         });
 
@@ -894,7 +903,7 @@
             }, 2000);
         }
 
-        function simulateRegister() {
+        function simulateRegister(profileData) {
             const registerLoading = document.getElementById('registerLoading');
             const registerSuccess = document.getElementById('registerSuccess');
             const submitBtn = registerForm.querySelector('.form-submit');
@@ -907,14 +916,7 @@
                 registerSuccess.classList.add('show');
 
                 setTimeout(() => {
-                    const occupation = document.getElementById('occupation').value;
-
-                    localStorage.setItem('userProfile', JSON.stringify({
-                        firstName,
-                        lastName,
-                        email,
-                        occupation
-                    }));
+                    localStorage.setItem('userProfile', JSON.stringify(profileData));
 
                     registerForm.reset();
                     registerSuccess.classList.remove('show');
