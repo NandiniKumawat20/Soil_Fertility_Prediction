@@ -661,7 +661,7 @@
                     <label for="registerPassword">Password</label>
                     <div class="input-wrapper">
                         <i class="fas fa-lock input-icon"></i>
-                        <input type="password" id="registerPassword" name="password" placeholder="Create a strong password" required>
+                        <input type="password" id="registerPassword" name="password" placeholder="At least 8 characters" minlength="8" required>
                     </div>
                     <div class="error-message" id="registerPasswordError"></div>
                 </div>
@@ -746,8 +746,8 @@
             if (!password) {
                 showError('loginPasswordError', 'Password is required');
                 isValid = false;
-            } else if (password.length < 6) {
-                showError('loginPasswordError', 'Password must be at least 6 characters');
+            } else if (password.length < 8) {
+                showError('loginPasswordError', 'Password must be at least 8 characters');
                 isValid = false;
             } else {
                 clearError('loginPasswordError');

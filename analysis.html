@@ -77,6 +77,14 @@
             box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
         }
 
+        .field-item input:invalid {
+            border-color: #ef4444;
+        }
+
+        .field-item input:invalid:focus {
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+        }
+
         .analysis-actions {
             display: flex;
             gap: 0.75rem;
@@ -417,18 +425,18 @@
 
             <form id="analysisForm">
                 <div class="feature-grid">
-                    <div class="field-item"><label for="n">N</label><input type="number" id="n" name="n" step="any" required></div>
-                    <div class="field-item"><label for="p">P</label><input type="number" id="p" name="p" step="any" required></div>
-                    <div class="field-item"><label for="k">K</label><input type="number" id="k" name="k" step="any" required></div>
-                    <div class="field-item"><label for="ph">pH</label><input type="number" id="ph" name="ph" step="any" required></div>
-                    <div class="field-item"><label for="ec">EC</label><input type="number" id="ec" name="ec" step="any" required></div>
-                    <div class="field-item"><label for="oc">OC</label><input type="number" id="oc" name="oc" step="any" required></div>
-                    <div class="field-item"><label for="s">S</label><input type="number" id="s" name="s" step="any" required></div>
-                    <div class="field-item"><label for="zn">Zn</label><input type="number" id="zn" name="zn" step="any" required></div>
-                    <div class="field-item"><label for="fe">Fe</label><input type="number" id="fe" name="fe" step="any" required></div>
-                    <div class="field-item"><label for="cu">Cu</label><input type="number" id="cu" name="cu" step="any" required></div>
-                    <div class="field-item"><label for="mn">Mn</label><input type="number" id="mn" name="mn" step="any" required></div>
-                    <div class="field-item"><label for="b">B</label><input type="number" id="b" name="b" step="any" required></div>
+                    <div class="field-item"><label for="n">N</label><input type="number" id="n" name="n" step="any" min="0" required></div>
+                    <div class="field-item"><label for="p">P</label><input type="number" id="p" name="p" step="any" min="0" required></div>
+                    <div class="field-item"><label for="k">K</label><input type="number" id="k" name="k" step="any" min="0" required></div>
+                    <div class="field-item"><label for="ph">pH</label><input type="number" id="ph" name="ph" step="any" min="0" required></div>
+                    <div class="field-item"><label for="ec">EC</label><input type="number" id="ec" name="ec" step="any" min="0" required></div>
+                    <div class="field-item"><label for="oc">OC</label><input type="number" id="oc" name="oc" step="any" min="0" required></div>
+                    <div class="field-item"><label for="s">S</label><input type="number" id="s" name="s" step="any" min="0" required></div>
+                    <div class="field-item"><label for="zn">Zn</label><input type="number" id="zn" name="zn" step="any" min="0" required></div>
+                    <div class="field-item"><label for="fe">Fe</label><input type="number" id="fe" name="fe" step="any" min="0" required></div>
+                    <div class="field-item"><label for="cu">Cu</label><input type="number" id="cu" name="cu" step="any" min="0" required></div>
+                    <div class="field-item"><label for="mn">Mn</label><input type="number" id="mn" name="mn" step="any" min="0" required></div>
+                    <div class="field-item"><label for="b">B</label><input type="number" id="b" name="b" step="any" min="0" required></div>
                 </div>
 
                 <div class="analysis-actions">
@@ -491,6 +499,19 @@
 
         analysisForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            // Validate all values are positive
+            const fields = ['n','p','k','ph','ec','oc','s','zn','fe','cu','mn','b'];
+            for (const f of fields) {
+                const el = document.getElementById(f);
+                const val = parseFloat(el.value);
+                if (isNaN(val) || val < 0) {
+                    resultBox.className = 'result-box show not-fertile';
+                    resultBox.innerHTML = `<strong>Invalid input:</strong> ${f.toUpperCase()} must be a positive number (0 or greater).`;
+                    el.focus();
+                    return;
+                }
+            }
 
             const formData = new FormData(analysisForm);
             const values = Object.fromEntries(formData.entries());
