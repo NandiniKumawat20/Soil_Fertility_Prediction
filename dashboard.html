@@ -685,6 +685,63 @@
             margin-bottom: 1.5rem;
         }
 
+
+        /* Feedback */
+        .feedback-fab {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 6rem;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(245,158,11,0.4);
+            z-index: 1500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .feedback-fab:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(245,158,11,0.5); }
+        .feedback-modal { position: fixed; inset: 0; background: rgba(15,23,42,0.5); display: none; align-items: center; justify-content: center; padding: 1rem; z-index: 2000; backdrop-filter: blur(4px); }
+        .feedback-modal.show { display: flex; }
+        .feedback-card { width: min(480px,100%); background: #fff; border-radius: 16px; box-shadow: var(--shadow-lg); overflow: hidden; animation: fadeScale 0.3s ease-out; }
+        .feedback-header { background: linear-gradient(135deg,#f59e0b,#d97706); color: #fff; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; }
+        .feedback-header-info { display: flex; align-items: center; gap: 0.75rem; }
+        .feedback-header-icon { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+        .feedback-header h4 { font-size: 0.95rem; margin: 0; }
+        .feedback-header span { font-size: 0.75rem; opacity: 0.85; }
+        .feedback-body { padding: 1.25rem; }
+        .feedback-progress { height: 4px; background: #e5e7eb; border-radius: 2px; margin-bottom: 0.5rem; overflow: hidden; }
+        .feedback-progress-fill { height: 100%; background: linear-gradient(90deg,#f59e0b,#d97706); border-radius: 2px; transition: width 0.4s ease; }
+        .feedback-step-label { font-size: 0.75rem; color: var(--text-light); margin-bottom: 1.25rem; text-align: center; }
+        .feedback-q { display: none; animation: fadeIn 0.3s ease; }
+        .feedback-q.active { display: block; }
+        .feedback-q h5 { font-size: 1rem; color: var(--text-dark); margin-bottom: 1rem; }
+        .star-rating { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+        .star-btn { background: none; border: none; font-size: 2rem; color: #e5e7eb; cursor: pointer; transition: color 0.2s, transform 0.15s; }
+        .star-btn:hover { transform: scale(1.15); }
+        .star-btn.active { color: #f59e0b; }
+        .star-label { display: block; text-align: center; font-size: 0.85rem; color: var(--text-light); }
+        .feedback-checks { display: flex; flex-direction: column; gap: 0.6rem; }
+        .feedback-check { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.75rem; background: #f8fafc; border-radius: 8px; cursor: pointer; font-size: 0.9rem; color: var(--text-dark); transition: background 0.2s; }
+        .feedback-check:hover { background: #f0fdf4; }
+        .feedback-check input { accent-color: #f59e0b; width: 16px; height: 16px; }
+        .feedback-options { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .feedback-opt-btn { padding: 0.55rem 1rem; border: 2px solid #e5e7eb; border-radius: 20px; background: #fff; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .feedback-opt-btn:hover { border-color: #f59e0b; background: #fffbeb; }
+        .feedback-opt-btn.selected { border-color: #f59e0b; background: #fef3c7; color: #92400e; }
+        .feedback-textarea { width: 100%; border: 2px solid #e5e7eb; border-radius: 10px; padding: 0.75rem; font-size: 0.9rem; font-family: inherit; resize: vertical; outline: none; transition: border-color 0.2s; }
+        .feedback-textarea:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.12); }
+        .feedback-nav { display: flex; justify-content: space-between; padding: 1rem 1.25rem; border-top: 1px solid #e5e7eb; }
+        .feedback-thanks { text-align: center; padding: 2rem 0; }
+        .feedback-thanks-icon { font-size: 3rem; color: #22c55e; margin-bottom: 0.75rem; }
+        .feedback-thanks h4 { font-size: 1.2rem; color: var(--text-dark); margin-bottom: 0.3rem; }
+        .feedback-thanks p { font-size: 0.9rem; color: var(--text-light); }
         /* Chatbot */
         .chat-fab {
             position: fixed;
@@ -1027,6 +1084,26 @@
             color: var(--green-600);
         }
 
+
+        .feedback-reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .feedback-review-card {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 1rem;
+            transition: transform 0.2s;
+        }
+        .feedback-review-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        .feedback-review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        .feedback-review-stars { color: #f59e0b; font-size: 0.85rem; }
+        .feedback-review-email { font-size: 0.75rem; color: var(--text-light); }
+        .feedback-review-text { font-size: 0.85rem; color: var(--text-dark); line-height: 1.5; margin-top: 0.4rem; }
+        .feedback-review-meta { font-size: 0.72rem; color: var(--text-light); margin-top: 0.5rem; }
+        .feedback-review-tag { display: inline-block; font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 8px; background: #fffbeb; color: #92400e; margin-right: 0.3rem; margin-top: 0.3rem; }
         /* Soil Guide Modal */
         .guide-modal {
             position: fixed;
@@ -1429,6 +1506,24 @@
                 </div>
             </div>
 
+
+            <!-- User Feedback Reviews -->
+            <div class="soil-conditions-section">
+                <div class="dash-card soil-cond-card">
+                    <div class="dash-card-head">
+                        <h3><i class="fas fa-comments"></i> Feedback Reviews</h3>
+                        <button class="btn btn-secondary btn-small" id="openFeedbackModal"><i class="fas fa-plus"></i> Give Feedback</button>
+                    </div>
+                    <div id="feedbackReviewsContent">
+                        <div class="soil-empty-state" id="feedbackEmptyState">
+                            <div class="soil-empty-icon"><i class="fas fa-star"></i></div>
+                            <h4>No feedback yet</h4>
+                            <p>Be the first to share your experience and help us improve.</p>
+                        </div>
+                        <div class="feedback-reviews-grid" id="feedbackReviewsGrid" style="display:none"></div>
+                    </div>
+                </div>
+            </div>
             <!-- Fertilizer Selector + Activity -->
             <div class="dash-grid">
                 <!-- Fertilizer Selector (Questionnaire) -->
@@ -1907,6 +2002,85 @@
                     </ul>
                     <div class="guide-warning"><strong>Warning Signs:</strong> Crusting on surface, standing water after rain, hard compacted layers, pale color, and absence of earthworms indicate degraded soil that needs immediate attention.</div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback -->
+    <button class="feedback-fab" id="feedbackFab" aria-label="Give feedback"><i class="fas fa-star"></i></button>
+    <div class="feedback-modal" id="feedbackModal">
+        <div class="feedback-card">
+            <div class="feedback-header">
+                <div class="feedback-header-info">
+                    <div class="feedback-header-icon"><i class="fas fa-star"></i></div>
+                    <div>
+                        <h4>Share Your Feedback</h4>
+                        <span>Help us improve your experience</span>
+                    </div>
+                </div>
+                <button class="modal-close" id="feedbackClose" style="color:#fff;opacity:0.8"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="feedback-body">
+                <div class="feedback-progress">
+                    <div class="feedback-progress-fill" id="feedbackProgressFill" style="width:20%"></div>
+                </div>
+                <div class="feedback-step-label" id="feedbackStepLabel">Question 1 of 5</div>
+                <div class="feedback-q active" id="fq1">
+                    <h5>How would you rate your overall experience?</h5>
+                    <div class="star-rating" id="ratingExperience">
+                        <button class="star-btn" data-value="1"><i class="fas fa-star"></i></button>
+                        <button class="star-btn" data-value="2"><i class="fas fa-star"></i></button>
+                        <button class="star-btn" data-value="3"><i class="fas fa-star"></i></button>
+                        <button class="star-btn" data-value="4"><i class="fas fa-star"></i></button>
+                        <button class="star-btn" data-value="5"><i class="fas fa-star"></i></button>
+                    </div>
+                    <span class="star-label" id="ratingLabel">Select a rating</span>
+                </div>
+                <div class="feedback-q" id="fq2">
+                    <h5>Which features did you find most useful?</h5>
+                    <div class="feedback-checks">
+                        <label class="feedback-check"><input type="checkbox" value="soil_analysis"> Soil Analysis</label>
+                        <label class="feedback-check"><input type="checkbox" value="fertilizer_selector"> Fertilizer Selector</label>
+                        <label class="feedback-check"><input type="checkbox" value="chatbot"> Chatbot</label>
+                        <label class="feedback-check"><input type="checkbox" value="soil_guide"> Soil Guide</label>
+                        <label class="feedback-check"><input type="checkbox" value="dashboard"> Dashboard Stats</label>
+                    </div>
+                </div>
+                <div class="feedback-q" id="fq3">
+                    <h5>How easy was it to use the application?</h5>
+                    <div class="feedback-options">
+                        <button class="feedback-opt-btn" data-value="very_easy">Very Easy</button>
+                        <button class="feedback-opt-btn" data-value="easy">Easy</button>
+                        <button class="feedback-opt-btn" data-value="moderate">Moderate</button>
+                        <button class="feedback-opt-btn" data-value="difficult">Difficult</button>
+                        <button class="feedback-opt-btn" data-value="very_difficult">Very Difficult</button>
+                    </div>
+                </div>
+                <div class="feedback-q" id="fq4">
+                    <h5>Would you recommend this to other farmers?</h5>
+                    <div class="feedback-options">
+                        <button class="feedback-opt-btn" data-value="definitely">Definitely</button>
+                        <button class="feedback-opt-btn" data-value="probably">Probably</button>
+                        <button class="feedback-opt-btn" data-value="maybe">Maybe</button>
+                        <button class="feedback-opt-btn" data-value="probably_not">Probably Not</button>
+                        <button class="feedback-opt-btn" data-value="no">No</button>
+                    </div>
+                </div>
+                <div class="feedback-q" id="fq5">
+                    <h5>Any suggestions or comments?</h5>
+                    <textarea class="feedback-textarea" id="feedbackComment" placeholder="Share your thoughts, suggestions, or report issues..." rows="4"></textarea>
+                </div>
+                <div class="feedback-q" id="fqThanks" style="display:none">
+                    <div class="feedback-thanks">
+                        <div class="feedback-thanks-icon"><i class="fas fa-check-circle"></i></div>
+                        <h4>Thank You!</h4>
+                        <p>Your feedback helps us improve SoilFertility for everyone.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="feedback-nav" id="feedbackNav">
+                <button class="btn btn-secondary" id="feedbackPrev" style="visibility:hidden"><i class="fas fa-arrow-left"></i> Back</button>
+                <button class="btn btn-primary" id="feedbackNext">Next <i class="fas fa-arrow-right"></i></button>
             </div>
         </div>
     </div>
@@ -2536,6 +2710,131 @@
         }
         window.renderSoilCharts = renderSoilCharts;
         loadSoilConditions();
+
+
+        // ---- Feedback Modal ----
+        const feedbackFab = document.getElementById('feedbackFab');
+        const feedbackModal = document.getElementById('feedbackModal');
+        let feedbackStep = 1;
+        const feedbackData = { rating: 0, features: [], ease: '', recommend: '', comment: '' };
+
+        feedbackFab.addEventListener('click', () => { feedbackModal.classList.add('show'); resetFeedback(); });
+        document.getElementById('feedbackClose').addEventListener('click', () => feedbackModal.classList.remove('show'));
+        feedbackModal.addEventListener('click', (e) => { if (e.target === feedbackModal) feedbackModal.classList.remove('show'); });
+
+        function resetFeedback() {
+            feedbackStep = 1;
+            feedbackData.rating = 0; feedbackData.features = []; feedbackData.ease = ''; feedbackData.recommend = ''; feedbackData.comment = '';
+            document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.feedback-check input').forEach(c => c.checked = false);
+            document.querySelectorAll('.feedback-opt-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById('feedbackComment').value = '';
+            document.getElementById('ratingLabel').textContent = 'Select a rating';
+            document.getElementById('fqThanks').style.display = 'none';
+            document.getElementById('feedbackNav').style.display = '';
+            for (let i = 1; i <= 5; i++) document.getElementById('fq' + i).style.display = '';
+            updateFeedbackUI();
+        }
+
+        const ratingLabels = ['','Poor','Fair','Good','Very Good','Excellent'];
+        document.getElementById('ratingExperience').addEventListener('click', (e) => {
+            const btn = e.target.closest('.star-btn');
+            if (!btn) return;
+            feedbackData.rating = parseInt(btn.dataset.value);
+            document.querySelectorAll('.star-btn').forEach((b, i) => b.classList.toggle('active', i < feedbackData.rating));
+            document.getElementById('ratingLabel').textContent = ratingLabels[feedbackData.rating];
+        });
+
+        document.querySelectorAll('#fq3 .feedback-opt-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#fq3 .feedback-opt-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                feedbackData.ease = btn.dataset.value;
+            });
+        });
+
+        document.querySelectorAll('#fq4 .feedback-opt-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#fq4 .feedback-opt-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                feedbackData.recommend = btn.dataset.value;
+            });
+        });
+
+        function updateFeedbackUI() {
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById('fq' + i).classList.toggle('active', i === feedbackStep);
+            }
+            document.getElementById('feedbackStepLabel').textContent = 'Question ' + feedbackStep + ' of 5';
+            document.getElementById('feedbackProgressFill').style.width = (feedbackStep / 5 * 100) + '%';
+            document.getElementById('feedbackPrev').style.visibility = feedbackStep > 1 ? 'visible' : 'hidden';
+            document.getElementById('feedbackNext').innerHTML = feedbackStep === 5 ? '<i class="fas fa-paper-plane"></i> Submit' : 'Next <i class="fas fa-arrow-right"></i>';
+        }
+
+        document.getElementById('feedbackNext').addEventListener('click', () => {
+            if (feedbackStep < 5) { feedbackStep++; updateFeedbackUI(); }
+            else { submitFeedback(); }
+        });
+        document.getElementById('feedbackPrev').addEventListener('click', () => { if (feedbackStep > 1) { feedbackStep--; updateFeedbackUI(); } });
+
+        function submitFeedback() {
+            feedbackData.features = [];
+            document.querySelectorAll('.feedback-check input:checked').forEach(c => feedbackData.features.push(c.value));
+            feedbackData.comment = document.getElementById('feedbackComment').value;
+
+            fetch(`${API}/api/feedback`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: email,
+                    rating: feedbackData.rating,
+                    features: feedbackData.features,
+                    ease: feedbackData.ease,
+                    recommend: feedbackData.recommend,
+                    comment: feedbackData.comment
+                })
+            }).catch(() => {});
+
+            for (let i = 1; i <= 5; i++) document.getElementById('fq' + i).style.display = 'none';
+            document.getElementById('fqThanks').style.display = 'block';
+            document.getElementById('feedbackNav').style.display = 'none';
+            document.getElementById('feedbackStepLabel').textContent = 'Submitted';
+            document.getElementById('feedbackProgressFill').style.width = '100%';
+            setTimeout(() => feedbackModal.classList.remove('show'), 3000);
+        }
+        updateFeedbackUI();
+
+        // ---- Feedback Reviews ----
+        document.getElementById("openFeedbackModal").addEventListener("click", () => { feedbackModal.classList.add("show"); resetFeedback(); });
+
+        async function loadFeedbackReviews() {
+            try {
+                const res = await fetch(API + "/api/feedback");
+                const data = await res.json();
+                if (!data.success || data.feedbacks.length === 0) {
+                    document.getElementById("feedbackEmptyState").style.display = "";
+                    document.getElementById("feedbackReviewsGrid").style.display = "none";
+                    return;
+                }
+                document.getElementById("feedbackEmptyState").style.display = "none";
+                document.getElementById("feedbackReviewsGrid").style.display = "";
+                const grid = document.getElementById("feedbackReviewsGrid");
+                let html = "";
+                data.feedbacks.forEach(f => {
+                    const starFilled = "\u2605".repeat(f.rating || 0);
+                    const starEmpty = "\u2606".repeat(5 - (f.rating || 0));
+                    const ts = f.timestamp ? new Date(f.timestamp).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
+                    const emailShort = f.email ? f.email.split("@")[0] : "Anonymous";
+                    html += '<div class="feedback-review-card">';
+                    html += '<div class="feedback-review-header"><div class="feedback-review-stars">' + starFilled + starEmpty + '</div><span class="feedback-review-email">' + emailShort + '</span></div>';
+                    if (f.comment) html += '<div class="feedback-review-text">' + f.comment + '</div>';
+                    html += '<div class="feedback-review-meta">' + ts + '</div>';
+                    html += '</div>';
+                });
+                grid.innerHTML = html;
+            } catch (e) { }
+        }
+        loadFeedbackReviews();
 
         // ---- Chatbot ----
         const chatFab = document.getElementById('chatFab');

@@ -4,7 +4,7 @@ import pickle
 import numpy as np
 import re
 import csv
-from db import create_user, authenticate_user, get_user_by_email, update_user, log_activity, get_user_activity, get_user_stats, get_user_monthly_activity, get_recent_soil_analyses, MONGO_CONNECTED
+from db import create_user, authenticate_user, get_user_by_email, update_user, log_activity, get_user_activity, get_user_stats, get_user_monthly_activity, get_recent_soil_analyses, save_feedback, get_all_feedback, MONGO_CONNECTED
 
 app = Flask(__name__)
 CORS(app)
@@ -603,6 +603,43 @@ def get_recent_analyses(email):
             return jsonify({'success': False, 'error': error}), 500
 
         return jsonify({'success': True, 'analyses': analyses})
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/feedback', methods=['POST'])
+def submit_feedback():
+    try:
+        data = request.get_json()
+        email = data.get('email', '').strip().lower()
+        rating = data.get('rating', 0)
+        features = data.get('features', [])
+        ease = data.get('ease', '')
+        recommend = data.get('recommend', '')
+        comment = data.get('comment', '')
+
+        if email:
+            log_activity(email, 'feedback', {'rating': rating})
+
+        success, error = save_feedback(email, rating, features, ease, recommend, comment)
+        if error:
+            return jsonify({'success': False, 'error': error}), 500
+
+        return jsonify({'success': True})
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/feedback', methods=['GET'])
+def get_feedback():
+    try:
+        feedbacks, error = get_all_feedback(limit=50)
+        if error:
+            return jsonify({'success': False, 'error': error}), 500
+
+        return jsonify({'success': True, 'feedbacks': feedbacks})
 
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500

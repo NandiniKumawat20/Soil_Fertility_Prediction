@@ -18,6 +18,9 @@ try:
     activity_collection = db['activity_log']
     activity_collection.create_index('email')
     activity_collection.create_index('timestamp')
+    feedback_collection = db['feedback']
+    feedback_collection.create_index('email')
+    feedback_collection.create_index('timestamp')
     MONGO_CONNECTED = True
     print("[DB] Connected to MongoDB successfully")
 except Exception as e:
@@ -25,6 +28,7 @@ except Exception as e:
     db = None
     users_collection = None
     activity_collection = None
+    feedback_collection = None
     MONGO_CONNECTED = False
     print(f"[DB] MongoDB connection failed: {e}")
 
@@ -301,5 +305,48 @@ def get_recent_soil_analyses(email, limit=5):
             analyses.append(entry)
 
         return analyses, None
+    except Exception as e:
+        return [], str(e)
+
+
+def save_feedback(email, rating, features, ease, recommend, comment):
+    if not MONGO_CONNECTED:
+        return False, "Database is not connected"
+
+    try:
+        feedback_doc = {
+            'email': email,
+            'rating': rating,
+            'features': features or [],
+            'ease': ease or '',
+            'recommend': recommend or '',
+            'comment': comment or '',
+            'timestamp': datetime.utcnow()
+        }
+        feedback_collection.insert_one(feedback_doc)
+        return True, None
+    except Exception as e:
+        return False, str(e)
+
+
+def get_all_feedback(limit=50):
+    if not MONGO_CONNECTED:
+        return [], "Database is not connected"
+
+    try:
+        cursor = feedback_collection.find(
+            {},
+            {'_id': 0}
+        ).sort('timestamp', -1).limit(limit)
+
+        feedbacks = []
+        for doc in cursor:
+            ts = doc.get('timestamp', '')
+            if hasattr(ts, 'isoformat'):
+                ts = ts.isoformat()
+            doc['timestamp'] = ts
+            feedbacks.append(doc)
+
+        return feedbacks, None
     except Exception as e:
         return [], str(e)
