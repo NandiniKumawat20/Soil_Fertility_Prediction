@@ -7,96 +7,805 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .dashboard-main {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
-            display: flex;
-            flex-direction: column;
+        :root {
+            --green-50: #f0fdf4;
+            --green-100: #dcfce7;
+            --green-200: #bbf7d0;
+            --green-500: #22c55e;
+            --green-600: #16a34a;
+            --green-700: #15803d;
+            --green-800: #166534;
+            --green-900: #14532d;
+            --blue-50: #eff6ff;
+            --blue-500: #3b82f6;
+            --blue-600: #2563eb;
+            --amber-50: #fffbeb;
+            --amber-500: #f59e0b;
+            --red-50: #fef2f2;
+            --red-500: #ef4444;
+            --purple-50: #f5f3ff;
+            --purple-500: #8b5cf6;
         }
 
-        .dashboard-topbar {
+        * { box-sizing: border-box; }
+
+        .dash-wrapper {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 50%, #f0f9ff 100%);
+            position: relative;
+        }
+
+        /* Topbar */
+        .dash-topbar {
             display: flex;
-            justify-content: flex-end;
-            padding: 1.5rem 2rem;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .dash-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .dash-brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--green-500), var(--green-700));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .dash-brand h2 {
+            font-size: 1.2rem;
+            color: var(--green-800);
+            margin: 0;
         }
 
         .profile-chip {
             background: white;
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 0.75rem 1rem;
+            padding: 0.6rem 1rem;
             box-shadow: var(--shadow);
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            max-width: 340px;
+            max-width: 300px;
             cursor: pointer;
+            transition: box-shadow 0.2s;
         }
 
+        .profile-chip:hover { box-shadow: var(--shadow-lg); }
+
         .profile-icon {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            background: #dcfce7;
-            color: #166534;
+            background: linear-gradient(135deg, var(--green-100), var(--green-200));
+            color: var(--green-700);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+        }
+
+        .profile-name { font-weight: 700; color: var(--text-dark); font-size: 0.9rem; }
+        .profile-role { color: var(--text-light); font-size: 0.8rem; }
+
+        /* Main content */
+        .dash-content {
+            padding: 0 2rem 3rem;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* Greeting */
+        .greeting-section {
+            margin-bottom: 2rem;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .greeting-section h1 {
+            font-size: 2rem;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .greeting-section h1 span {
+            background: linear-gradient(135deg, var(--green-600), var(--blue-500));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .greeting-section p {
+            color: var(--text-light);
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        /* Usage Statistics with Ring Charts */
+        .usage-stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .usage-stat-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.25s, box-shadow 0.25s;
+            border: 1px solid #f1f5f9;
+        }
+
+        .usage-stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .ring-chart {
+            width: 56px;
+            height: 56px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .ring-chart svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .ring-bg {
+            fill: none;
+            stroke: #f1f5f9;
+            stroke-width: 3;
+        }
+
+        .ring-fill {
+            fill: none;
+            stroke-width: 3;
+            stroke-linecap: round;
+            transition: stroke-dasharray 1s ease;
+        }
+
+        .ring-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .usage-stat-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .usage-stat-sub {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 0.15rem;
+        }
+
+        .usage-stat-sub i {
+            font-size: 0.65rem;
+            margin-right: 2px;
+        }
+
+        /* Charts Row */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            animation: slideUp 0.7s ease-out;
+        }
+
+        .chart-card {
+            margin-bottom: 0;
+        }
+
+        .chart-badge {
+            font-size: 0.75rem;
+            background: #f0fdf4;
+            color: #16a34a;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .chart-container-inner {
+            position: relative;
+            height: 250px;
+            padding: 0.5rem 0;
+        }
+
+        .chart-container-inner canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .donut-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .donut-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .donut-total {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1;
+        }
+
+        .donut-label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 0.15rem;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Quick actions */
+        .actions-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .action-card.green:hover { border-color: var(--green-500); }
+        .action-card.blue:hover { border-color: var(--blue-500); }
+        .action-card.purple:hover { border-color: var(--purple-500); }
+        .action-card.amber:hover { border-color: var(--amber-500); }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin: 0 auto 0.6rem;
+        }
+
+        .action-card.green .action-icon { background: var(--green-50); color: var(--green-600); }
+        .action-card.blue .action-icon { background: var(--blue-50); color: var(--blue-500); }
+        .action-card.purple .action-icon { background: var(--purple-50); color: var(--purple-500); }
+        .action-card.amber .action-icon { background: var(--amber-50); color: var(--amber-500); }
+
+        .action-title { font-weight: 700; font-size: 0.95rem; color: var(--text-dark); margin-bottom: 0.2rem; }
+        .action-desc { font-size: 0.8rem; color: var(--text-light); }
+
+        /* Card base */
+        .dash-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+            border: 1px solid #f1f5f9;
+            margin-bottom: 1.5rem;
+            animation: slideUp 0.6s ease-out backwards;
+        }
+
+        .dash-card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .dash-card-head h3 {
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dash-card-head h3 i { color: var(--green-600); }
+
+        /* Fertilizer Questionnaire */
+        .fert-step-indicator {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--green-600);
+            background: var(--green-50);
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .fert-progress-bar {
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .fert-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            border-radius: 2px;
+            transition: width 0.4s ease;
+        }
+
+        .fert-step {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .fert-step.active { display: block; }
+
+        .fert-step-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            color: var(--green-600);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .fert-step h4 {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .fert-step-desc {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 1.25rem;
+        }
+
+        .fert-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .fert-options-multi {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .fert-opt-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            text-align: center;
+        }
+
+        .fert-opt-btn:hover {
+            border-color: var(--green-400);
+            background: #f0fdf4;
+            transform: translateY(-2px);
+        }
+
+        .fert-opt-btn.selected {
+            border-color: var(--green-500);
+            background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+            box-shadow: 0 4px 12px rgba(34,197,94,0.15);
+        }
+
+        .fert-opt-btn i { font-size: 1.3rem; }
+        .fert-opt-btn strong { font-size: 0.9rem; color: var(--text-dark); }
+        .fert-opt-btn span { font-size: 0.75rem; color: var(--text-light); }
+
+        .fert-select-wrapper {
+            max-width: 400px;
+        }
+
+        .fert-question-select {
+            width: 100%;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            background: #fff;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+
+        .fert-question-select:focus {
+            border-color: var(--green-500);
+            box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
+            outline: none;
+        }
+
+        .fert-sliders {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            max-width: 500px;
+        }
+
+        .fert-slider-row label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .fert-slider-val {
+            color: var(--green-600);
+            font-weight: 700;
+        }
+
+        .fert-range {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: #e5e7eb;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .fert-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--green-500);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(34,197,94,0.4);
+        }
+
+        .fert-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.25rem;
+            gap: 1rem;
+        }
+
+        .fert-nav-btn { min-width: 120px; justify-content: center; }
+
+        /* Results */
+        .fert-results {
+            margin-top: 1.25rem;
+            display: none;
+        }
+
+        .fert-results.show { display: block; }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .result-header h4 {
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .match-badge {
+            font-size: 0.8rem;
+            background: var(--green-100);
+            color: var(--green-700);
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .fert-result-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--green-500);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .fert-result-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .fert-result-card.top { border-left-color: var(--green-600); background: var(--green-50); }
+
+        .fert-result-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .fert-result-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-dark);
+        }
+
+        .fert-confidence {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            background: var(--green-100);
+            color: var(--green-700);
+        }
+
+        .fert-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+
+        .fert-meta-item {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .fert-meta-item strong {
+            color: var(--text-dark);
+        }
+
+        .fert-tags {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .fert-tag {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: var(--text-light);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            color: #e5e7eb;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        /* Activity */
+        .activity-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0.75rem;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+
+        .activity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .activity-dot.green { background: var(--green-500); }
+        .activity-dot.blue { background: var(--blue-500); }
+        .activity-dot.amber { background: var(--amber-500); }
+
+        .activity-text { flex: 1; font-size: 0.85rem; color: var(--text-dark); }
+        .activity-time { font-size: 0.75rem; color: var(--text-light); white-space: nowrap; }
+
+        /* Two column grid */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Chatbot */
+        .chat-fab {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(34,197,94,0.4);
+            z-index: 1500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .chat-fab:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(34,197,94,0.5); }
+
+        .chat-window {
+            position: fixed;
+            bottom: 5.5rem;
+            right: 1.5rem;
+            width: 380px;
+            max-height: 520px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+            z-index: 1500;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-window.open { display: flex; }
+
+        .chat-header {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .chat-header-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1rem;
         }
 
-        .profile-info {
-            min-width: 0;
-        }
+        .chat-header-info h4 { font-size: 0.95rem; margin: 0; }
+        .chat-header-info span { font-size: 0.75rem; opacity: 0.85; }
 
-        .profile-name {
-            font-weight: 700;
-            color: var(--text-dark);
-            font-size: 0.95rem;
-            line-height: 1.2;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .profile-role {
-            color: var(--text-light);
-            font-size: 0.85rem;
-            line-height: 1.2;
-            margin-top: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .dashboard-center {
+        .chat-messages {
             flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 2rem;
+            gap: 0.75rem;
+            max-height: 340px;
+            background: #f9fafb;
         }
 
-        .dashboard-center h1 {
-            font-size: 2.5rem;
-            color: var(--text-dark);
-            margin-bottom: 0.75rem;
+        .chat-msg {
+            max-width: 85%;
+            padding: 0.65rem 0.9rem;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            word-wrap: break-word;
         }
 
-        .dashboard-center p {
-            color: var(--text-light);
-            margin-bottom: 2rem;
-            max-width: 560px;
+        .chat-msg.bot { background: #fff; border: 1px solid #e5e7eb; color: #1f2937; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .chat-msg.user { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .chat-msg.bot strong { color: #166534; }
+        .chat-msg.typing { align-self: flex-start; background: #fff; border: 1px solid #e5e7eb; padding: 0.6rem 1rem; border-bottom-left-radius: 4px; }
+
+        .typing-dots span { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #9ca3af; margin: 0 2px; animation: typingBounce 1.2s infinite; }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+        .chat-input-area { display: flex; padding: 0.75rem; border-top: 1px solid #e5e7eb; background: #fff; gap: 0.5rem; }
+
+        .chat-input-area input {
+            flex: 1;
+            border: 2px solid #e5e7eb;
+            border-radius: 24px;
+            padding: 0.6rem 1rem;
+            font-size: 0.88rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
         }
 
-        .analysis-btn {
-            min-width: 220px;
-            justify-content: center;
-            font-size: 1.05rem;
+        .chat-input-area input:focus { border-color: #22c55e; }
+
+        .chat-send-btn {
+            width: 40px; height: 40px; border-radius: 50%; border: none;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff; font-size: 0.95rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: transform 0.15s;
         }
 
+        .chat-send-btn:hover { transform: scale(1.05); }
+        .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Profile modal */
         .profile-modal {
             position: fixed;
             inset: 0;
@@ -106,11 +815,10 @@
             justify-content: center;
             padding: 1rem;
             z-index: 2000;
+            backdrop-filter: blur(4px);
         }
 
-        .profile-modal.show {
-            display: flex;
-        }
+        .profile-modal.show { display: flex; }
 
         .profile-modal-card {
             width: min(520px, 100%);
@@ -118,20 +826,22 @@
             border-radius: 14px;
             box-shadow: var(--shadow-lg);
             padding: 1.2rem;
+            animation: fadeScale 0.3s ease-out;
+        }
+
+        @keyframes fadeScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .profile-modal-head {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 1rem;
             margin-bottom: 0.75rem;
         }
 
-        .profile-modal-head h3 {
-            color: var(--text-dark);
-            font-size: 1.1rem;
-        }
+        .profile-modal-head h3 { color: var(--text-dark); font-size: 1.1rem; }
 
         .modal-close {
             border: none;
@@ -139,13 +849,12 @@
             color: var(--text-light);
             font-size: 1.2rem;
             cursor: pointer;
+            transition: color 0.2s;
         }
 
-        .profile-details {
-            display: grid;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
+        .modal-close:hover { color: var(--text-dark); }
+
+        .profile-details { display: grid; gap: 0.5rem; }
 
         .profile-row {
             background: #f8fafc;
@@ -154,116 +863,1751 @@
             padding: 0.55rem 0.7rem;
         }
 
-        .profile-row strong {
-            color: var(--text-dark);
+        .profile-row strong { color: var(--text-dark); }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .actions-row { grid-template-columns: 1fr 1fr; }
+            .usage-stats-row { grid-template-columns: 1fr 1fr; }
+            .charts-row { grid-template-columns: 1fr; }
+            .chart-card-small { order: -1; }
+            .soil-cond-grid { grid-template-columns: 1fr; }
+            .soil-cond-charts { grid-template-columns: 1fr 1fr; }
+            .dash-grid { grid-template-columns: 1fr; }
+            .fert-options { grid-template-columns: 1fr 1fr; }
+            .fert-sliders { max-width: 100%; }
         }
 
         @media (max-width: 640px) {
-            .dashboard-topbar {
-                padding: 1rem;
-            }
+            .dash-topbar { padding: 1rem; }
+            .dash-content { padding: 0 1rem 2rem; }
+            .greeting-section h1 { font-size: 1.5rem; }
+            .actions-row { grid-template-columns: 1fr; }
+            .usage-stats-row { grid-template-columns: 1fr 1fr; }
+            .soil-cond-charts { grid-template-columns: 1fr; }
+            .fert-options, .fert-options-multi { grid-template-columns: 1fr; }
+            .chat-window { width: calc(100vw - 2rem); right: -0.5rem; bottom: 5rem; }
+        }
 
-            .profile-chip {
-                max-width: 100%;
-            }
+        /* Recent Soil Conditions */
+        .soil-conditions-section {
+            margin-bottom: 1.5rem;
+            animation: slideUp 0.7s ease-out;
+        }
 
-            .dashboard-center h1 {
-                font-size: 1.8rem;
-            }
+        .soil-cond-card { margin-bottom: 0; }
+
+        .soil-empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .soil-empty-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            color: var(--green-500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 1rem;
+        }
+
+        .soil-empty-state h4 {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 0.4rem;
+        }
+
+        .soil-empty-state p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 1.25rem;
+        }
+
+        .soil-cond-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .soil-cond-charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .soil-chart-wrap {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .soil-chart-wrap h5 {
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+
+        .soil-chart-wrap canvas { max-height: 220px; }
+
+        .soil-cond-history h5 {
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .soil-history-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .soil-history-item:hover { background: #f0fdf4; border-color: var(--green-300); }
+        .soil-history-item.active { background: #f0fdf4; border-color: var(--green-500); }
+
+        .soil-history-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .soil-history-badge.good { background: #dcfce7; color: #16a34a; }
+        .soil-history-badge.moderate { background: #fef3c7; color: #d97706; }
+        .soil-history-badge.poor { background: #fecaca; color: #dc2626; }
+
+        .soil-history-info { flex: 1; min-width: 0; }
+
+        .soil-history-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .soil-history-meta {
+            font-size: 0.72rem;
+            color: var(--text-light);
+        }
+
+        .soil-history-score {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--green-600);
+        }
+
+        /* Soil Guide Modal */
+        .guide-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+
+        .guide-modal.show { display: flex; }
+
+        .guide-modal-card {
+            width: min(900px, 100%);
+            max-height: 85vh;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            animation: fadeScale 0.3s ease-out;
+            overflow: hidden;
+        }
+
+        .guide-modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .guide-modal-head h3 {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .guide-modal-body {
+            overflow-y: auto;
+            padding: 1.5rem;
+            flex: 1;
+        }
+
+        .guide-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.75rem;
+        }
+
+        .guide-tab {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            transition: all 0.2s;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+
+        .guide-tab:hover { background: #f0fdf4; color: var(--green-600); }
+        .guide-tab.active { background: var(--green-100); color: var(--green-700); }
+
+        .guide-section { display: none; }
+        .guide-section.active { display: block; animation: fadeIn 0.3s ease; }
+
+        .guide-section h4 {
+            font-size: 1.15rem;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .guide-section h4 i { color: var(--green-600); }
+
+        .guide-section p {
+            color: var(--text-light);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .guide-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .guide-info-card {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .guide-info-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .guide-info-card h5 {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .guide-info-card h5 i { font-size: 0.85rem; }
+
+        .guide-info-card p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .guide-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        .guide-table th {
+            background: var(--green-50);
+            color: var(--green-700);
+            font-weight: 600;
+            text-align: left;
+            padding: 0.6rem 0.75rem;
+            border-bottom: 2px solid var(--green-200);
+        }
+
+        .guide-table td {
+            padding: 0.55rem 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            color: var(--text-dark);
+        }
+
+        .guide-table tr:hover td { background: #f8fafc; }
+
+        .guide-tip {
+            background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+            border-left: 4px solid var(--green-500);
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1rem;
+            font-size: 0.88rem;
+            color: var(--text-dark);
+        }
+
+        .guide-tip strong { color: var(--green-700); }
+
+        .guide-warning {
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+            border-left: 4px solid var(--amber-500);
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1rem;
+            font-size: 0.88rem;
+            color: var(--text-dark);
+        }
+
+        .guide-warning strong { color: #b45309; }
+
+        .nutrient-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nutrient-bar-label {
+            width: 80px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .nutrient-bar {
+            flex: 1;
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .nutrient-bar-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.8s ease;
+        }
+
+        .nutrient-bar-value {
+            width: 60px;
+            text-align: right;
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .guide-list {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+
+        .guide-list li {
+            padding: 0.4rem 0;
+            color: var(--text-dark);
+            font-size: 0.88rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .guide-list li i {
+            color: var(--green-500);
+            margin-top: 0.2rem;
+            flex-shrink: 0;
         }
     </style>
 </head>
 <body>
-    <main class="dashboard-main">
-        <div class="dashboard-topbar">
-            <div class="profile-chip" id="profileChip" role="button" tabindex="0" aria-label="Open user details">
+    <div class="dash-wrapper">
+        <!-- Topbar -->
+        <header class="dash-topbar">
+            <div class="dash-brand">
+                <div class="dash-brand-icon"><i class="fas fa-seedling"></i></div>
+                <h2>SoilFertility</h2>
+            </div>
+            <div class="profile-chip" id="profileChip" role="button" tabindex="0" aria-label="User menu">
                 <div class="profile-icon"><i class="fas fa-user"></i></div>
                 <div class="profile-info">
                     <div class="profile-name" id="profileName">User</div>
                     <div class="profile-role" id="profileRole">Farmer</div>
                 </div>
             </div>
-        </div>
+        </header>
 
-        <section class="dashboard-center">
-            <h1>Main Dashboard</h1>
-            <p>Welcome to your soil fertility workspace. Start by running an analysis to get insights and recommendations.</p>
-            <button class="btn btn-primary analysis-btn" id="doAnalysisBtn">
-                <i class="fas fa-flask"></i>
-                Do Analysis
-            </button>
-        </section>
-    </main>
+        <!-- Main content -->
+        <div class="dash-content">
+            <!-- Greeting -->
+            <section class="greeting-section">
+                <h1 id="greetingText">Welcome back, <span id="greetingName">Farmer</span></h1>
+                <p>Your soil health command center is ready.</p>
+            </section>
 
-    <div class="profile-modal" id="profileModal" aria-hidden="true">
-        <div class="profile-modal-card">
-            <div class="profile-modal-head">
-                <h3><i class="fas fa-id-card"></i> Registered User Details</h3>
-                <button class="modal-close" id="closeProfileModal" aria-label="Close user details">
-                    <i class="fas fa-times"></i>
-                </button>
+            <!-- Usage Statistics -->
+            <div class="usage-stats-row" id="usageStats">
+                <div class="usage-stat-card">
+                    <div class="ring-chart" data-value="0" data-color="#22c55e">
+                        <svg viewBox="0 0 36 36">
+                            <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            <path class="ring-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#22c55e" stroke-dasharray="0, 100"/>
+                        </svg>
+                        <span class="ring-value" id="statSoilAnalysis">0</span>
+                    </div>
+                    <div class="usage-stat-info">
+                        <div class="usage-stat-label">Soil Analyses</div>
+                        <div class="usage-stat-sub"><i class="fas fa-flask"></i> Fertility checks</div>
+                    </div>
+                </div>
+                <div class="usage-stat-card">
+                    <div class="ring-chart" data-value="0" data-color="#3b82f6">
+                        <svg viewBox="0 0 36 36">
+                            <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            <path class="ring-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#3b82f6" stroke-dasharray="0, 100"/>
+                        </svg>
+                        <span class="ring-value" id="statSoilReports">0</span>
+                    </div>
+                    <div class="usage-stat-info">
+                        <div class="usage-stat-label">Reports</div>
+                        <div class="usage-stat-sub"><i class="fas fa-clipboard-list"></i> Generated</div>
+                    </div>
+                </div>
+                <div class="usage-stat-card">
+                    <div class="ring-chart" data-value="0" data-color="#f59e0b">
+                        <svg viewBox="0 0 36 36">
+                            <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            <path class="ring-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#f59e0b" stroke-dasharray="0, 100"/>
+                        </svg>
+                        <span class="ring-value" id="statFertilizerPred">0</span>
+                    </div>
+                    <div class="usage-stat-info">
+                        <div class="usage-stat-label">Fertilizer Uses</div>
+                        <div class="usage-stat-sub"><i class="fas fa-seedling"></i> Recommendations</div>
+                    </div>
+                </div>
+                <div class="usage-stat-card">
+                    <div class="ring-chart" data-value="0" data-color="#8b5cf6">
+                        <svg viewBox="0 0 36 36">
+                            <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            <path class="ring-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#8b5cf6" stroke-dasharray="0, 100"/>
+                        </svg>
+                        <span class="ring-value" id="statChatbot">0</span>
+                    </div>
+                    <div class="usage-stat-info">
+                        <div class="usage-stat-label">Chat Sessions</div>
+                        <div class="usage-stat-sub"><i class="fas fa-comment-dots"></i> Conversations</div>
+                    </div>
+                </div>
             </div>
-            <div class="profile-details">
-                <div class="profile-row"><strong>Name:</strong> <span id="detailName">-</span></div>
-                <div class="profile-row"><strong>Email:</strong> <span id="detailEmail">-</span></div>
-                <div class="profile-row"><strong>Occupation:</strong> <span id="detailOccupation">-</span></div>
-                <div class="profile-row"><strong>Country:</strong> <span id="detailCountry">-</span></div>
-                <div class="profile-row"><strong>Phone:</strong> <span id="detailPhone">-</span></div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="dash-card chart-card">
+                    <div class="dash-card-head">
+                        <h3><i class="fas fa-chart-bar"></i> Activity Trend</h3>
+                        <span class="chart-badge">Last 6 months</span>
+                    </div>
+                    <div class="chart-container-inner">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+                <div class="dash-card chart-card chart-card-small">
+                    <div class="dash-card-head">
+                        <h3><i class="fas fa-chart-pie"></i> Usage Breakdown</h3>
+                    </div>
+                    <div class="chart-container-inner donut-wrapper">
+                        <canvas id="donutChart"></canvas>
+                        <div class="donut-center">
+                            <span class="donut-total" id="donutTotal">0</span>
+                            <span class="donut-label">Total</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="actions-row">
+                <a href="analysis.html" class="action-card green">
+                    <div class="action-icon"><i class="fas fa-flask"></i></div>
+                    <div class="action-title">Soil Analysis</div>
+                    <div class="action-desc">Check soil fertility with ML</div>
+                </a>
+                <div class="action-card blue" id="scrollToFert">
+                    <div class="action-icon"><i class="fas fa-seedling"></i></div>
+                    <div class="action-title">Fertilizer Selector</div>
+                    <div class="action-desc">Get best fertilizer advice</div>
+                </div>
+                <div class="action-card purple" id="openChatAction">
+                    <div class="action-icon"><i class="fas fa-comment-dots"></i></div>
+                    <div class="action-title">Ask Chatbot</div>
+                    <div class="action-desc">Get instant farming help</div>
+                </div>
+                <div class="action-card amber" id="openGuideAction">
+                    <div class="action-icon"><i class="fas fa-book-open"></i></div>
+                    <div class="action-title">Soil Guide</div>
+                    <div class="action-desc">Learn soil management</div>
+                </div>
+            </div>
+
+            <!-- Recent Soil Conditions -->
+            <div class="soil-conditions-section">
+                <div class="dash-card soil-cond-card">
+                    <div class="dash-card-head">
+                        <h3><i class="fas fa-microscope"></i> Recent Soil Conditions</h3>
+                        <a href="analysis.html" class="btn btn-secondary btn-small"><i class="fas fa-plus"></i> New Analysis</a>
+                    </div>
+                    <div id="soilCondContent">
+                        <div class="soil-empty-state" id="soilEmptyState">
+                            <div class="soil-empty-icon"><i class="fas fa-seedling"></i></div>
+                            <h4>No soil analyses yet</h4>
+                            <p>Run your first soil analysis to see nutrient levels and conditions here.</p>
+                            <a href="analysis.html" class="btn btn-primary btn-small"><i class="fas fa-flask"></i> Analyze Soil</a>
+                        </div>
+                        <div class="soil-cond-grid" id="soilCondGrid" style="display:none">
+                            <div class="soil-cond-charts">
+                                <div class="soil-chart-wrap">
+                                    <h5>Nutrient Levels</h5>
+                                    <canvas id="soilBarChart"></canvas>
+                                </div>
+                                <div class="soil-chart-wrap">
+                                    <h5>Balance Radar</h5>
+                                    <canvas id="soilRadarChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="soil-cond-history">
+                                <h5>Analysis History</h5>
+                                <div id="soilHistoryList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fertilizer Selector + Activity -->
+            <div class="dash-grid">
+                <!-- Fertilizer Selector (Questionnaire) -->
+                <div class="dash-card" id="fertilizerSection">
+                    <div class="dash-card-head">
+                        <h3><i class="fas fa-seedling"></i> Fertilizer Selector</h3>
+                        <span class="fert-step-indicator" id="stepIndicator">Step 1 of 7</span>
+                    </div>
+
+                    <!-- Progress bar -->
+                    <div class="fert-progress-bar">
+                        <div class="fert-progress-fill" id="progressFill" style="width:14.28%"></div>
+                    </div>
+
+                    <!-- Step 1: Soil pH -->
+                    <div class="fert-step active" id="step1">
+                        <div class="fert-step-icon"><i class="fas fa-vial"></i></div>
+                        <h4>What is your soil pH?</h4>
+                        <p class="fert-step-desc">Helps decide if soil is acidic, neutral, or alkaline</p>
+                        <div class="fert-options">
+                            <button class="fert-opt-btn" data-value="acidic">
+                                <i class="fas fa-arrow-down" style="color:#ef4444"></i>
+                                <strong>Acidic (pH &lt; 6.0)</strong>
+                                <span>Sour soil, low pH</span>
+                            </button>
+                            <button class="fert-opt-btn" data-value="neutral">
+                                <i class="fas fa-equals" style="color:#22c55e"></i>
+                                <strong>Neutral (pH 6.0 - 7.5)</strong>
+                                <span>Ideal for most crops</span>
+                            </button>
+                            <button class="fert-opt-btn" data-value="alkaline">
+                                <i class="fas fa-arrow-up" style="color:#3b82f6"></i>
+                                <strong>Alkaline (pH &gt; 7.5)</strong>
+                                <span>Sweet soil, high pH</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Nutrient Deficiency -->
+                    <div class="fert-step" id="step2">
+                        <div class="fert-step-icon"><i class="fas fa-atom"></i></div>
+                        <h4>Which nutrients are lacking in the soil?</h4>
+                        <p class="fert-step-desc">Select all that apply based on symptoms or soil test</p>
+                        <div class="fert-options fert-options-multi">
+                            <button class="fert-opt-btn fert-multi" data-value="nitrogen">
+                                <strong style="color:#22c55e">N</strong>
+                                <strong>Nitrogen</strong>
+                                <span>Yellow leaves, stunted growth</span>
+                            </button>
+                            <button class="fert-opt-btn fert-multi" data-value="phosphorus">
+                                <strong style="color:#3b82f6">P</strong>
+                                <strong>Phosphorus</strong>
+                                <span>Purple leaves, poor roots</span>
+                            </button>
+                            <button class="fert-opt-btn fert-multi" data-value="potassium">
+                                <strong style="color:#f59e0b">K</strong>
+                                <strong>Potassium</strong>
+                                <span>Brown edges, weak stems</span>
+                            </button>
+                            <button class="fert-opt-btn fert-multi" data-value="multiple">
+                                <strong style="color:#8b5cf6"><i class="fas fa-layer-group"></i></strong>
+                                <strong>Multiple / Not sure</strong>
+                                <span>General deficiency</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Crop Type -->
+                    <div class="fert-step" id="step3">
+                        <div class="fert-step-icon"><i class="fas fa-seedling"></i></div>
+                        <h4>What type of crop are you growing?</h4>
+                        <p class="fert-step-desc">Different crops need different nutrients</p>
+                        <div class="fert-select-wrapper">
+                            <select id="qCropType" class="fert-question-select">
+                                <option value="">Select your crop...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Growth Stage -->
+                    <div class="fert-step" id="step4">
+                        <div class="fert-step-icon"><i class="fas fa-chart-line"></i></div>
+                        <h4>What is the current growth stage?</h4>
+                        <p class="fert-step-desc">Nutrient needs change as the crop develops</p>
+                        <div class="fert-options">
+                            <button class="fert-opt-btn" data-value="seedling">
+                                <i class="fas fa-seedling" style="color:#22c55e"></i>
+                                <strong>Seedling</strong>
+                                <span>Just planted / sprouting</span>
+                            </button>
+                            <button class="fert-opt-btn" data-value="vegetative">
+                                <i class="fas fa-leaf" style="color:#16a34a"></i>
+                                <strong>Vegetative</strong>
+                                <span>Leaf and stem growth</span>
+                            </button>
+                            <button class="fert-opt-btn" data-value="flowering">
+                                <i class="fas fa-sun" style="color:#f59e0b"></i>
+                                <strong>Flowering</strong>
+                                <span>Bloom / pollination stage</span>
+                            </button>
+                            <button class="fert-opt-btn" data-value="fruiting">
+                                <i class="fas fa-apple-alt" style="color:#ef4444"></i>
+                                <strong>Fruiting</strong>
+                                <span>Grain / fruit development</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Soil Type -->
+                    <div class="fert-step" id="step5">
+                        <div class="fert-step-icon"><i class="fas fa-mountain"></i></div>
+                        <h4>What is your soil type?</h4>
+                        <p class="fert-step-desc">Affects nutrient retention and drainage</p>
+                        <div class="fert-select-wrapper">
+                            <select id="qSoilType" class="fert-question-select">
+                                <option value="">Select your soil type...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Step 6: Weather / Climate -->
+                    <div class="fert-step" id="step6">
+                        <div class="fert-step-icon"><i class="fas fa-cloud-sun"></i></div>
+                        <h4>What are the current weather conditions?</h4>
+                        <p class="fert-step-desc">Temperature, rainfall, and humidity affect nutrient uptake</p>
+                        <div class="fert-sliders">
+                            <div class="fert-slider-row">
+                                <label>Temperature <span id="tempVal" class="fert-slider-val">25&deg;C</span></label>
+                                <input type="range" id="qTemp" min="10" max="45" value="25" class="fert-range">
+                            </div>
+                            <div class="fert-slider-row">
+                                <label>Humidity <span id="humVal" class="fert-slider-val">50%</span></label>
+                                <input type="range" id="qHumidity" min="10" max="100" value="50" class="fert-range">
+                            </div>
+                            <div class="fert-slider-row">
+                                <label>Soil Moisture <span id="moisVal" class="fert-slider-val">40%</span></label>
+                                <input type="range" id="qMoisture" min="10" max="90" value="40" class="fert-range">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 7: Preference -->
+                    <div class="fert-step" id="step7">
+                        <div class="fert-step-icon"><i class="fas fa-leaf"></i></div>
+                        <h4>Do you prefer organic or chemical fertilizer?</h4>
+                        <p class="fert-step-desc">Based on farming method and sustainability goals</p>
+                        <div class="fert-options">
+                            <button class="fert-opt-btn" data-value="chemical">
+                                <i class="fas fa-flask" style="color:#3b82f6"></i>
+                                <strong>Chemical Fertilizer</strong>
+                                <span>Fast-acting, precise nutrients</span>
+                            </button>
+                            <button class="fert-opt-btn" data-value="organic">
+                                <i class="fas fa-recycle" style="color:#22c55e"></i>
+                                <strong>Organic</strong>
+                                <span>Natural, soil-building</span>
+                            </button>
+                            <button class="fert-opt-btn" data-value="both">
+                                <i class="fas fa-balance-scale" style="color:#8b5cf6"></i>
+                                <strong>Integrated (Both)</strong>
+                                <span>Best of both approaches</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="fert-nav">
+                        <button class="btn btn-secondary fert-nav-btn" id="prevStepBtn" style="visibility:hidden">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button class="btn btn-primary fert-nav-btn" id="nextStepBtn" disabled>
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Results -->
+                    <div class="fert-results" id="fertResults">
+                        <div class="result-header">
+                            <h4><i class="fas fa-check-circle" style="color:var(--green-500)"></i> Recommendation</h4>
+                            <button class="btn btn-secondary btn-small" id="restartQuiz"><i class="fas fa-redo"></i> Start Over</button>
+                        </div>
+                        <div id="fertResultsList"></div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="dash-card">
+                    <div class="dash-card-head">
+                        <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                    </div>
+                    <div id="recentActivity">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            No recent activity yet.<br>Start by running an analysis!
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Profile Modal -->
+    <div class="profile-modal" id="profileModal">
+        <div class="profile-modal-card">
+            <div class="profile-modal-head">
+                <h3><i class="fas fa-id-card"></i> User Profile</h3>
+                <button class="modal-close" id="profileModalClose"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="profile-details">
+                <div class="profile-row"><strong>Name:</strong> <span id="detailName"></span></div>
+                <div class="profile-row"><strong>Email:</strong> <span id="detailEmail"></span></div>
+                <div class="profile-row"><strong>Occupation:</strong> <span id="detailOccupation"></span></div>
+                <div class="profile-row"><strong>Country:</strong> <span id="detailCountry"></span></div>
+                <div class="profile-row"><strong>Phone:</strong> <span id="detailPhone"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Soil Guide Modal -->
+    <div class="guide-modal" id="guideModal">
+        <div class="guide-modal-card">
+            <div class="guide-modal-head">
+                <h3><i class="fas fa-book-open"></i> Complete Soil Management Guide</h3>
+                <button class="modal-close" id="guideModalClose" style="color:#fff;opacity:0.8;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="guide-modal-body">
+                <div class="guide-tabs">
+                    <button class="guide-tab active" data-tab="types">Soil Types</button>
+                    <button class="guide-tab" data-tab="nutrients">Nutrients (NPK)</button>
+                    <button class="guide-tab" data-tab="ph">Soil pH</button>
+                    <button class="guide-tab" data-tab="micronutrients">Micronutrients</button>
+                    <button class="guide-tab" data-tab="testing">Soil Testing</button>
+                    <button class="guide-tab" data-tab="organic">Organic Matter</button>
+                    <button class="guide-tab" data-tab="seasonal">Seasonal Care</button>
+                    <button class="guide-tab" data-tab="conservation">Conservation</button>
+                </div>
+
+                <!-- Soil Types -->
+                <div class="guide-section active" id="guide-types">
+                    <h4><i class="fas fa-mountain"></i> Understanding Soil Types</h4>
+                    <p>Soil type determines water retention, drainage, nutrient availability, and which crops grow best. Identifying your soil type is the first step toward effective management.</p>
+                    <div class="guide-card-grid">
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-circle" style="color:#8B4513"></i> Clay Soil</h5>
+                            <p>Heavy, sticky when wet, holds water well. Rich in nutrients but poor drainage. Best for: Paddy, Wheat. Add sand and organic matter to improve structure.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-circle" style="color:#D2B48C"></i> Sandy Soil</h5>
+                            <p>Light, gritty, drains quickly. Low in nutrients and dries out fast. Best for: Groundnut, Watermelon. Add compost and clay to improve water retention.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-circle" style="color:#654321"></i> Loamy Soil</h5>
+                            <p>Ideal mix of sand, silt, and clay. Good drainage with moisture retention. Best for: Most crops. The gold standard for farming.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-circle" style="color:#A0522D"></i> Silt Soil</h5>
+                            <p>Smooth, retains moisture well. Fertile but can compact easily. Best for: Vegetables, Wheat. Avoid working when wet to prevent compaction.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-circle" style="color:#556B2F"></i> Peat Soil</h5>
+                            <p>Dark, rich in organic matter, acidic. High water holding capacity. Best for: Vegetables. May need lime to reduce acidity.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-circle" style="color:#C0C0C0"></i> Chalky Soil</h5>
+                            <p>Alkaline, stony, free-draining. Can cause nutrient lockout. Best for: Barley, Cabbage. Add sulfur or organic matter to lower pH.</p>
+                        </div>
+                    </div>
+                    <div class="guide-tip"><strong>Quick Test:</strong> Squeeze moist soil in your hand. If it holds shape but crumbles when poked, it's loamy. If it stays in a tight ball, it's clay. If it falls apart immediately, it's sandy.</div>
+                </div>
+
+                <!-- Nutrients -->
+                <div class="guide-section" id="guide-nutrients">
+                    <h4><i class="fas fa-atom"></i> Macronutrients (NPK)</h4>
+                    <p>Nitrogen (N), Phosphorus (P), and Potassium (K) are the three primary nutrients essential for plant growth. Understanding their roles helps you fertilize effectively.</p>
+                    <div class="guide-card-grid">
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-leaf" style="color:#22c55e"></i> Nitrogen (N)</h5>
+                            <p><strong>Role:</strong> Leaf growth, chlorophyll production, protein synthesis.<br><strong>Deficiency:</strong> Yellowing of older leaves, stunted growth.<br><strong>Sources:</strong> Urea, Ammonium Sulfate, FYM.<br><strong>Range:</strong> 280-560 kg/ha optimal.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-seedling" style="color:#3b82f6"></i> Phosphorus (P)</h5>
+                            <p><strong>Role:</strong> Root development, energy transfer, flowering.<br><strong>Deficiency:</strong> Purple/dark leaves, poor roots.<br><strong>Sources:</strong> DAP, SSP, Bone Meal.<br><strong>Range:</strong> 10-25 kg/ha optimal.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-shield-alt" style="color:#f59e0b"></i> Potassium (K)</h5>
+                            <p><strong>Role:</strong> Disease resistance, water regulation, fruit quality.<br><strong>Deficiency:</strong> Brown leaf edges, weak stems.<br><strong>Sources:</strong> MOP, SOP, Wood Ash.<br><strong>Range:</strong> 200-500 kg/ha optimal.</p>
+                        </div>
+                    </div>
+                    <h4 style="margin-top:1rem">NPK Application Guidelines</h4>
+                    <table class="guide-table">
+                        <thead><tr><th>Crop</th><th>N (kg/ha)</th><th>P (kg/ha)</th><th>K (kg/ha)</th><th>Application</th></tr></thead>
+                        <tbody>
+                            <tr><td>Wheat</td><td>120</td><td>60</td><td>40</td><td>N in 2 splits, P&K at sowing</td></tr>
+                            <tr><td>Rice</td><td>100</td><td>40</td><td>40</td><td>N in 3 splits, P&K basal</td></tr>
+                            <tr><td>Maize</td><td>150</td><td>75</td><td>50</td><td>N in 2 splits, P&K at sowing</td></tr>
+                            <tr><td>Cotton</td><td>100</td><td>50</td><td>50</td><td>N in 2 splits, P&K basal</td></tr>
+                            <tr><td>Vegetables</td><td>80-120</td><td>40-60</td><td>40-60</td><td>Balanced NPK with organic matter</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="guide-warning"><strong>Caution:</strong> Excessive nitrogen causes lush foliage but weak stems, attracts pests, and reduces fruit quality. Always apply based on soil test results.</div>
+                </div>
+
+                <!-- pH -->
+                <div class="guide-section" id="guide-ph">
+                    <h4><i class="fas fa-vial"></i> Soil pH Management</h4>
+                    <p>Soil pH controls nutrient availability. Most crops thrive between pH 6.0-7.5. Even small shifts can lock out critical nutrients.</p>
+                    <div class="guide-card-grid">
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-arrow-down" style="color:#ef4444"></i> Acidic Soil (pH &lt; 5.5)</h5>
+                            <p>Aluminum toxicity, reduced P availability. Apply agricultural lime (CaCO3) at 1-2 tonnes/ha. Dolomite lime also adds magnesium. Takes 2-3 months to take effect.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-check-circle" style="color:#22c55e"></i> Optimal (pH 6.0 - 7.5)</h5>
+                            <p>All major nutrients available. Most crops grow well. Maintain with regular organic matter additions and balanced fertilization.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-arrow-up" style="color:#3b82f6"></i> Alkaline Soil (pH &gt; 8.5)</h5>
+                            <p>Iron, zinc, manganese lockout. Apply elemental sulfur or aluminum sulfate. Use acidic mulches (pine needles, coffee grounds). Add gypsum for structure.</p>
+                        </div>
+                    </div>
+                    <h4>Nutrient Availability vs pH</h4>
+                    <div style="margin-bottom:1rem">
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Nitrogen</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:85%;background:linear-gradient(90deg,#22c55e,#16a34a)"></div></div><span class="nutrient-bar-value">Best: 6.0-8.0</span></div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Phosphorus</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:75%;background:linear-gradient(90deg,#3b82f6,#2563eb)"></div></div><span class="nutrient-bar-value">Best: 6.5-7.5</span></div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Potassium</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:80%;background:linear-gradient(90deg,#f59e0b,#d97706)"></div></div><span class="nutrient-bar-value">Best: 6.0-7.5</span></div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Iron</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:70%;background:linear-gradient(90deg,#ef4444,#dc2626)"></div></div><span class="nutrient-bar-value">Best: 4.0-6.5</span></div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Zinc</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:65%;background:linear-gradient(90deg,#8b5cf6,#7c3aed)"></div></div><span class="nutrient-bar-value">Best: 5.0-7.0</span></div>
+                    </div>
+                    <div class="guide-tip"><strong>Tip:</strong> Test pH before planting season. Lime works slowly, apply 2-3 months before sowing. Sulfur acts faster but should be applied in warm, moist soil.</div>
+                </div>
+
+                <!-- Micronutrients -->
+                <div class="guide-section" id="guide-micronutrients">
+                    <h4><i class="fas fa-flask"></i> Essential Micronutrients</h4>
+                    <p>Micronutrients are needed in small quantities but are critical for crop health. Deficiencies can severely limit yields even when NPK levels are adequate.</p>
+                    <table class="guide-table">
+                        <thead><tr><th>Element</th><th>Role</th><th>Deficiency Signs</th><th>Source</th><th>Rate</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Zinc (Zn)</strong></td><td>Enzyme activation, growth hormones</td><td>Stunted growth, small leaves</td><td>ZnSO4</td><td>25 kg/ha</td></tr>
+                            <tr><td><strong>Iron (Fe)</strong></td><td>Chlorophyll synthesis</td><td>Interveinal chlorosis (yellow between veins)</td><td>FeSO4 or chelated Fe</td><td>50 kg/ha or 0.5% spray</td></tr>
+                            <tr><td><strong>Manganese (Mn)</strong></td><td>Photosynthesis, nitrogen metabolism</td><td>Yellow spots on leaves</td><td>MnSO4</td><td>20-25 kg/ha</td></tr>
+                            <tr><td><strong>Copper (Cu)</strong></td><td>Enzyme activity, grain filling</td><td>Wilting, pale leaf tips</td><td>CuSO4</td><td>10-15 kg/ha</td></tr>
+                            <tr><td><strong>Boron (B)</strong></td><td>Cell wall formation, pollination</td><td>Hollow stems, poor fruit set</td><td>Borax</td><td>10-15 kg/ha</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="guide-warning"><strong>Boron Warning:</strong> Boron has a very narrow range between deficient and toxic. Never exceed recommended rates. Apply carefully and mix thoroughly with soil.</div>
+                    <h4>Crop-Specific Micronutrient Needs</h4>
+                    <ul class="guide-list">
+                        <li><i class="fas fa-check"></i><strong>Rice:</strong> Zinc is critical. Apply ZnSO4 at 25 kg/ha before transplanting.</li>
+                        <li><i class="fas fa-check"></i><strong>Wheat:</strong> Iron and manganese important in alkaline soils.</li>
+                        <li><i class="fas fa-check"></i><strong>Citrus:</strong> Zinc, iron, and manganese often deficient. Foliar spray recommended.</li>
+                        <li><i class="fas fa-check"></i><strong>Cauliflower/Cabbage:</strong> Boron is critical for head formation.</li>
+                        <li><i class="fas fa-check"></i><strong>Potato:</strong> Manganese important for tuber quality.</li>
+                    </ul>
+                </div>
+
+                <!-- Soil Testing -->
+                <div class="guide-section" id="guide-testing">
+                    <h4><i class="fas fa-microscope"></i> Soil Testing Guide</h4>
+                    <p>Regular soil testing is the foundation of good soil management. It tells you exactly what your soil needs, preventing waste and environmental damage.</p>
+                    <h4>How to Collect Soil Samples</h4>
+                    <ul class="guide-list">
+                        <li><i class="fas fa-check"></i>Sample at 0-15 cm depth for most crops; 15-30 cm for deep-rooted crops.</li>
+                        <li><i class="fas fa-check"></i>Collect 15-20 sub-samples in a zigzag pattern across the field.</li>
+                        <li><i class="fas fa-check"></i>Mix all sub-samples in a clean bucket, take 500g as representative sample.</li>
+                        <li><i class="fas fa-check"></i>Label with field name, date, previous crop, and planned crop.</li>
+                        <li><i class="fas fa-check"></i>Avoid sampling immediately after fertilizer application or during waterlogged conditions.</li>
+                        <li><i class="fas fa-check"></i>Best time: 2-3 months before sowing season.</li>
+                    </ul>
+                    <h4>Parameters to Test</h4>
+                    <div class="guide-card-grid">
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-list"></i> Basic Package</h5>
+                            <p>pH, EC (Electrical Conductivity), Organic Carbon, Available N, P, K. Cost-effective and covers the essentials.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-list-ol"></i> Standard Package</h5>
+                            <p>All basic parameters plus Sulfur, Zinc, Iron, Copper, Manganese, Boron. Recommended for comprehensive management.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-clipboard-list"></i> Advanced Package</h5>
+                            <p>All standard parameters plus CEC, soil texture, microbial activity. For research or problem diagnosis.</p>
+                        </div>
+                    </div>
+                    <div class="guide-tip"><strong>Frequency:</strong> Test soil at least once every 2-3 years. Test annually for high-value crops or when changing farming practices.</div>
+                </div>
+
+                <!-- Organic Matter -->
+                <div class="guide-section" id="guide-organic">
+                    <h4><i class="fas fa-recycle"></i> Building Organic Matter</h4>
+                    <p>Soil organic matter (SOM) is the cornerstone of soil health. It improves structure, water retention, nutrient cycling, and supports beneficial organisms.</p>
+                    <h4>Target Organic Carbon Levels</h4>
+                    <div style="margin-bottom:1rem">
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Low</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:25%;background:#ef4444"></div></div><span class="nutrient-bar-value">&lt; 0.5%</span></div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Medium</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:55%;background:#f59e0b"></div></div><span class="nutrient-bar-value">0.5 - 0.75%</span></div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Good</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:80%;background:#22c55e"></div></div><span class="nutrient-bar-value">0.75 - 1.0%</span></div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Excellent</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:100%;background:linear-gradient(90deg,#22c55e,#16a34a)"></div></div><span class="nutrient-bar-value">&gt; 1.0%</span></div>
+                    </div>
+                    <h4>Organic Amendments</h4>
+                    <table class="guide-table">
+                        <thead><tr><th>Amendment</th><th>Rate</th><th>NPK Content</th><th>Best For</th></tr></thead>
+                        <tbody>
+                            <tr><td>Farmyard Manure (FYM)</td><td>10-15 t/ha</td><td>0.5-0.7% N, 0.3% P, 0.5% K</td><td>All crops, general improvement</td></tr>
+                            <tr><td>Vermicompost</td><td>2-5 t/ha</td><td>1.5-2% N, 1% P, 1.5% K</td><td>Vegetables, nurseries</td></tr>
+                            <tr><td>Compost</td><td>5-10 t/ha</td><td>0.5-1% N, 0.3% P, 0.5% K</td><td>Field crops, orchards</td></tr>
+                            <tr><td>Neem Cake</td><td>250 kg/ha</td><td>5% N, 1% P, 1% K</td><td>Pest suppression + fertility</td></tr>
+                            <tr><td>Green Manure</td><td>Incorporate before flowering</td><td>Varies by species</td><td>Rice, sugarcane rotations</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="guide-tip"><strong>Green Manuring:</strong> Grow dhaincha, sunhemp, or cowpea for 45-60 days and incorporate before flowering. This adds 60-80 kg N/ha naturally and improves soil structure.</div>
+                </div>
+
+                <!-- Seasonal Care -->
+                <div class="guide-section" id="guide-seasonal">
+                    <h4><i class="fas fa-calendar-alt"></i> Seasonal Soil Management</h4>
+                    <p>Soil care varies by season. Following a seasonal calendar ensures your soil is in the best condition for each crop cycle.</p>
+                    <div class="guide-card-grid">
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-cloud-rain" style="color:#3b82f6"></i> Kharif (Monsoon: Jun-Sep)</h5>
+                            <p>Focus on drainage to prevent waterlogging. Apply full P&K dose at sowing. Split N applications. Build raised beds in heavy soils. Grow green manure crops in fallow fields.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-snowflake" style="color:#8b5cf6"></i> Rabi (Winter: Oct-Mar)</h5>
+                            <p>Best time for lime application. Apply full P&K at sowing. Complete N dose in 2 splits. Deep plowing to expose soil to sun. Add organic matter during field preparation.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-sun" style="color:#f59e0b"></i> Zaid (Summer: Mar-Jun)</h5>
+                            <p>Minimal tillage to conserve moisture. Heavy mulching (5-10 cm). Grow short-duration green manure. Repair drainage channels. Solarize soil to kill pathogens.</p>
+                        </div>
+                    </div>
+                    <h4>Annual Soil Care Calendar</h4>
+                    <table class="guide-table">
+                        <thead><tr><th>Month</th><th>Activity</th><th>Purpose</th></tr></thead>
+                        <tbody>
+                            <tr><td>Jan-Feb</td><td>Collect soil samples</td><td>Plan fertilizer needs for Kharif</td></tr>
+                            <tr><td>Mar-Apr</td><td>Deep plowing + FYM application</td><td>Soil aeration and organic matter</td></tr>
+                            <tr><td>May</td><td>Apply lime/sulfur if needed</td><td>pH correction (needs 2-3 months)</td></tr>
+                            <tr><td>Jun-Jul</td><td>Sowing + basal P&K</td><td>Foundation nutrition</td></tr>
+                            <tr><td>Aug-Sep</td><td>Top-dress N + drainage</td><td>Mid-season nutrition</td></tr>
+                            <tr><td>Oct-Nov</td><td>Rabi sowing + full P&K</td><td>Winter crop nutrition</td></tr>
+                            <tr><td>Dec</td><td>Green manure in fallow fields</td><td>Nitrogen fixation + structure</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Conservation -->
+                <div class="guide-section" id="guide-conservation">
+                    <h4><i class="fas fa-shield-alt"></i> Soil Conservation Practices</h4>
+                    <p>Soil erosion and degradation threaten long-term productivity. These practices protect your most valuable resource.</p>
+                    <div class="guide-card-grid">
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-wind"></i> Contour Farming</h5>
+                            <p>Plow and plant along contour lines (same elevation). Reduces water runoff by 50% and soil loss by 75%. Essential on slopes &gt; 2%.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-layer-group"></i> Mulching</h5>
+                            <p>Apply 5-10 cm of crop residue or straw. Reduces evaporation by 25-50%, suppresses weeds, adds organic matter as it decomposes.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-sync-alt"></i> Crop Rotation</h5>
+                            <p>Alternate deep-rooted and shallow-rooted crops. Cereal-legume rotation fixes nitrogen and breaks pest cycles. Never grow the same crop consecutively.</p>
+                        </div>
+                        <div class="guide-info-card">
+                            <h5><i class="fas fa-tree"></i> Bunding & Terracing</h5>
+                            <p>Build soil bunds on slopes. Terracing converts steep slopes into flat steps. Reduces erosion dramatically on hillside farms.</p>
+                        </div>
+                    </div>
+                    <h4>Healthy Soil Indicators</h4>
+                    <ul class="guide-list">
+                        <li><i class="fas fa-check"></i><strong>Earthworms:</strong> 10+ per shovel = healthy soil biology</li>
+                        <li><i class="fas fa-check"></i><strong>Aggregate stability:</strong> Soil clumps resist crumbling in water</li>
+                        <li><i class="fas fa-check"></i><strong>Water infiltration:</strong> Water soaks in within seconds, not minutes</li>
+                        <li><i class="fas fa-check"></i><strong>Root penetration:</strong> Roots spread easily through the soil profile</li>
+                        <li><i class="fas fa-check"></i><strong>Earthy smell:</strong> Pleasant earthy smell indicates active microbial life</li>
+                        <li><i class="fas fa-check"></i><strong>Dark color:</strong> Darker soil generally means higher organic matter</li>
+                    </ul>
+                    <div class="guide-warning"><strong>Warning Signs:</strong> Crusting on surface, standing water after rain, hard compacted layers, pale color, and absence of earthworms indicate degraded soil that needs immediate attention.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot -->
+    <button class="chat-fab" id="chatFab" aria-label="Open chatbot"><i class="fas fa-comment-dots"></i></button>
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="chat-header-icon"><i class="fas fa-seedling"></i></div>
+            <div class="chat-header-info"><h4>Soil Health Assistant</h4><span>Ask about soil, fertilizers & crops</span></div>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Ask about soil health..." autocomplete="off">
+            <button class="chat-send-btn" id="chatSendBtn" aria-label="Send"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
     <script>
+        const API = 'http://localhost:5000';
         const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
         const firstName = profile.firstName || 'User';
         const lastName = profile.lastName || '';
         const fullName = `${firstName} ${lastName}`.trim();
         const occupation = profile.occupation || 'Farmer';
-        const email = profile.email || 'Not provided';
-        const country = profile.country || 'Not provided';
-        const phone = profile.phone || 'Not provided';
+        const email = profile.email || '';
 
+        // Profile display
         document.getElementById('profileName').textContent = fullName;
         document.getElementById('profileRole').textContent = occupation;
+        document.getElementById('greetingName').textContent = firstName;
         document.getElementById('detailName').textContent = fullName;
-        document.getElementById('detailEmail').textContent = email;
+        document.getElementById('detailEmail').textContent = email || 'Not provided';
         document.getElementById('detailOccupation').textContent = occupation;
-        document.getElementById('detailCountry').textContent = country;
-        document.getElementById('detailPhone').textContent = phone;
+        document.getElementById('detailCountry').textContent = profile.country || 'Not provided';
+        document.getElementById('detailPhone').textContent = profile.phone || 'Not provided';
 
-        document.getElementById('doAnalysisBtn').addEventListener('click', () => {
-            window.location.href = 'analysis.html';
-        });
+        // Greeting based on time
+        const hour = new Date().getHours();
+        let greet = 'Good evening';
+        if (hour < 12) greet = 'Good morning';
+        else if (hour < 17) greet = 'Good afternoon';
+        document.getElementById('greetingText').innerHTML = `${greet}, <span>${firstName}</span>`;
 
+        // Profile modal
         const profileChip = document.getElementById('profileChip');
         const profileModal = document.getElementById('profileModal');
-        const closeProfileModal = document.getElementById('closeProfileModal');
 
-        const openModal = () => {
-            profileModal.classList.add('show');
-            profileModal.setAttribute('aria-hidden', 'false');
-        };
+        profileChip.addEventListener('click', () => profileModal.classList.add('show'));
+        document.getElementById('profileModalClose').addEventListener('click', () => profileModal.classList.remove('show'));
+        profileModal.addEventListener('click', (e) => { if (e.target === profileModal) profileModal.classList.remove('show'); });
 
-        const closeModal = () => {
-            profileModal.classList.remove('show');
-            profileModal.setAttribute('aria-hidden', 'true');
-        };
+        // Scroll to fertilizer
+        document.getElementById('scrollToFert').addEventListener('click', () => {
+            document.getElementById('fertilizerSection').scrollIntoView({ behavior: 'smooth' });
+        });
 
-        profileChip.addEventListener('click', openModal);
-        profileChip.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                openModal();
+        // ---- Soil Guide Modal ----
+        const guideModal = document.getElementById('guideModal');
+        document.getElementById('openGuideAction').addEventListener('click', () => guideModal.classList.add('show'));
+        document.getElementById('guideModalClose').addEventListener('click', () => guideModal.classList.remove('show'));
+        guideModal.addEventListener('click', (e) => { if (e.target === guideModal) guideModal.classList.remove('show'); });
+
+        // Guide tabs
+        document.querySelectorAll('.guide-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.guide-section').forEach(s => s.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('guide-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // ---- Fertilizer Questionnaire Logic ----
+        const TOTAL_STEPS = 7;
+        let currentStep = 1;
+        const quizAnswers = {};
+
+        // Load dropdown options from API
+        async function loadFertilizerOptions() {
+            try {
+                const res = await fetch(`${API}/api/fertilizer/options`);
+                const data = await res.json();
+                if (!data.success) return;
+
+                const soilSelect = document.getElementById('qSoilType');
+                const cropSelect = document.getElementById('qCropType');
+
+                data.soil_types.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s; opt.textContent = s;
+                    soilSelect.appendChild(opt);
+                });
+
+                data.crop_types.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c; opt.textContent = c;
+                    cropSelect.appendChild(opt);
+                });
+            } catch (e) {
+                console.error('Failed to load options:', e);
+            }
+        }
+        loadFertilizerOptions();
+
+        // Slider live update
+        document.getElementById('qTemp').addEventListener('input', function() {
+            document.getElementById('tempVal').textContent = this.value + '\u00B0C';
+        });
+        document.getElementById('qHumidity').addEventListener('input', function() {
+            document.getElementById('humVal').textContent = this.value + '%';
+        });
+        document.getElementById('qMoisture').addEventListener('input', function() {
+            document.getElementById('moisVal').textContent = this.value + '%';
+        });
+
+        function updateStepUI() {
+            // Show/hide steps
+            for (let i = 1; i <= TOTAL_STEPS; i++) {
+                const el = document.getElementById('step' + i);
+                if (el) el.classList.toggle('active', i === currentStep);
+            }
+            // Progress
+            document.getElementById('stepIndicator').textContent = `Step ${currentStep} of ${TOTAL_STEPS}`;
+            document.getElementById('progressFill').style.width = ((currentStep / TOTAL_STEPS) * 100) + '%';
+            // Nav buttons
+            const prev = document.getElementById('prevStepBtn');
+            const next = document.getElementById('nextStepBtn');
+            prev.style.visibility = currentStep > 1 ? 'visible' : 'hidden';
+            if (currentStep === TOTAL_STEPS) {
+                next.innerHTML = '<i class="fas fa-magic"></i> Get Recommendation';
+            } else {
+                next.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+            }
+            validateCurrentStep();
+        }
+
+        function isStepValid(step) {
+            switch (step) {
+                case 1: return !!quizAnswers.soil_ph;
+                case 2: return !!quizAnswers.nutrients;
+                case 3: return !!document.getElementById('qCropType').value;
+                case 4: return !!quizAnswers.growth_stage;
+                case 5: return !!document.getElementById('qSoilType').value;
+                case 6: return true; // sliders always have values
+                case 7: return !!quizAnswers.preference;
+                default: return false;
+            }
+        }
+
+        function validateCurrentStep() {
+            document.getElementById('nextStepBtn').disabled = !isStepValid(currentStep);
+        }
+
+        // Option button clicks (single select)
+        ['step1', 'step4', 'step7'].forEach(stepId => {
+            document.getElementById(stepId).addEventListener('click', (e) => {
+                const btn = e.target.closest('.fert-opt-btn');
+                if (!btn || btn.classList.contains('fert-multi')) return;
+                // Deselect others
+                btn.parentElement.querySelectorAll('.fert-opt-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                // Store answer
+                if (stepId === 'step1') quizAnswers.soil_ph = btn.dataset.value;
+                if (stepId === 'step4') quizAnswers.growth_stage = btn.dataset.value;
+                if (stepId === 'step7') quizAnswers.preference = btn.dataset.value;
+                validateCurrentStep();
+            });
+        });
+
+        // Multi-select for step 2 (nutrients)
+        document.getElementById('step2').addEventListener('click', (e) => {
+            const btn = e.target.closest('.fert-opt-btn');
+            if (!btn) return;
+            btn.classList.toggle('selected');
+            if (btn.dataset.value === 'multiple') {
+                // If "Multiple" selected, deselect others
+                if (btn.classList.contains('selected')) {
+                    btn.parentElement.querySelectorAll('.fert-opt-btn').forEach(b => {
+                        if (b !== btn) b.classList.remove('selected');
+                    });
+                }
+            } else {
+                // If specific nutrient selected, deselect "Multiple"
+                const multiBtn = btn.parentElement.querySelector('[data-value="multiple"]');
+                if (multiBtn) multiBtn.classList.remove('selected');
+            }
+            const selected = [];
+            btn.parentElement.querySelectorAll('.fert-opt-btn.selected').forEach(b => selected.push(b.dataset.value));
+            quizAnswers.nutrients = selected.length > 0 ? selected : null;
+            validateCurrentStep();
+        });
+
+        // Dropdown change listeners
+        document.getElementById('qCropType').addEventListener('change', validateCurrentStep);
+        document.getElementById('qSoilType').addEventListener('change', validateCurrentStep);
+
+        // Navigation
+        document.getElementById('nextStepBtn').addEventListener('click', () => {
+            if (currentStep < TOTAL_STEPS) {
+                currentStep++;
+                updateStepUI();
+            } else {
+                submitQuiz();
             }
         });
 
-        closeProfileModal.addEventListener('click', closeModal);
-        profileModal.addEventListener('click', (e) => {
-            if (e.target === profileModal) {
-                closeModal();
+        document.getElementById('prevStepBtn').addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepUI();
             }
         });
+
+        // Restart
+        document.getElementById('restartQuiz').addEventListener('click', () => {
+            currentStep = 1;
+            Object.keys(quizAnswers).forEach(k => delete quizAnswers[k]);
+            document.querySelectorAll('.fert-opt-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById('qCropType').value = '';
+            document.getElementById('qSoilType').value = '';
+            document.getElementById('qTemp').value = 25;
+            document.getElementById('qHumidity').value = 50;
+            document.getElementById('qMoisture').value = 40;
+            document.getElementById('tempVal').textContent = '25\u00B0C';
+            document.getElementById('humVal').textContent = '50%';
+            document.getElementById('moisVal').textContent = '40%';
+            document.getElementById('fertResults').classList.remove('show');
+            document.querySelector('.fert-progress-bar').style.display = '';
+            document.querySelector('.fert-nav').style.display = '';
+            updateStepUI();
+        });
+
+        function inferNPK(nutrients) {
+            // Based on selected deficiencies, set NPK values
+            // Low value indicates deficiency, higher value indicates adequate
+            let n = 25, p = 25, k = 25;
+            if (!nutrients || nutrients.includes('multiple')) {
+                n = 15; p = 15; k = 10;
+            } else {
+                if (nutrients.includes('nitrogen')) n = 10; else n = 30;
+                if (nutrients.includes('phosphorus')) p = 10; else p = 30;
+                if (nutrients.includes('potassium')) k = 8; else k = 25;
+            }
+            return { nitrogen: n, phosphorus: p, potassium: k };
+        }
+
+        async function submitQuiz() {
+            const nextBtn = document.getElementById('nextStepBtn');
+            nextBtn.disabled = true;
+            nextBtn.innerHTML = '<span class="spinner"></span> Analyzing...';
+
+            const npk = inferNPK(quizAnswers.nutrients);
+            const body = {
+                soil_type: document.getElementById('qSoilType').value,
+                crop_type: document.getElementById('qCropType').value,
+                temperature: parseFloat(document.getElementById('qTemp').value),
+                humidity: parseFloat(document.getElementById('qHumidity').value),
+                moisture: parseFloat(document.getElementById('qMoisture').value),
+                nitrogen: npk.nitrogen,
+                phosphorus: npk.phosphorus,
+                potassium: npk.potassium,
+                soil_ph: quizAnswers.soil_ph,
+                growth_stage: quizAnswers.growth_stage,
+                preference: quizAnswers.preference,
+                email: email
+            };
+
+            try {
+                const res = await fetch(`${API}/fertilizer-predict`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error || 'Failed');
+
+                // Hide progress and nav
+                document.querySelector('.fert-progress-bar').style.display = 'none';
+                document.querySelector('.fert-nav').style.display = 'none';
+                document.querySelectorAll('.fert-step').forEach(s => s.classList.remove('active'));
+                document.getElementById('stepIndicator').textContent = 'Result';
+
+                const listDiv = document.getElementById('fertResultsList');
+                let html = '';
+
+                // Primary recommendation
+                if (data.fertilizer) {
+                    const info = data.info || {};
+                    html += `
+                        <div class="fert-result-card top">
+                            <div class="fert-result-head">
+                                <span class="fert-result-name"><i class="fas fa-trophy" style="color:#f59e0b;margin-right:6px"></i>${data.fertilizer}</span>
+                                ${info.npk ? `<span class="fert-confidence">${info.npk}</span>` : ''}
+                            </div>
+                            ${info.description ? `<p style="font-size:0.85rem;color:#64748b;margin:0.5rem 0">${info.description}</p>` : ''}
+                            ${info.application ? `<p style="font-size:0.8rem;color:#1e293b;margin:0.3rem 0"><strong>Application:</strong> ${info.application}</p>` : ''}
+                            ${info.crops ? `<p style="font-size:0.8rem;color:#1e293b;margin:0.3rem 0"><strong>Crops:</strong> ${info.crops}</p>` : ''}
+                            ${info.tips ? `<p style="font-size:0.8rem;color:#16a34a;margin:0.3rem 0"><strong>Tip:</strong> ${info.tips}</p>` : ''}
+                        </div>
+                    `;
+                }
+
+                // Top alternatives
+                if (data.top_recommendations && data.top_recommendations.length > 1) {
+                    html += `<h4 style="font-size:0.95rem;color:#1e293b;margin:1rem 0 0.5rem">Other Recommendations</h4>`;
+                    data.top_recommendations.forEach((r, i) => {
+                        if (i === 0) return; // skip primary
+                        if (r.confidence <= 0) return;
+                        html += `
+                            <div class="fert-result-card">
+                                <div class="fert-result-head">
+                                    <span class="fert-result-name">${r.name}</span>
+                                    <span class="fert-confidence">${r.confidence}%</span>
+                                </div>
+                                ${r.npk ? `<div class="fert-meta"><span class="fert-meta-item"><strong>NPK:</strong> ${r.npk}</span></div>` : ''}
+                                ${r.description ? `<p style="font-size:0.8rem;color:#64748b;margin:0.3rem 0">${r.description}</p>` : ''}
+                            </div>
+                        `;
+                    });
+                }
+
+                // Advice sections
+                if (data.ph_advice) {
+                    html += `<div class="guide-tip" style="margin-top:1rem"><strong>pH Advice:</strong> ${data.ph_advice}</div>`;
+                }
+                if (data.stage_advice) {
+                    html += `<div class="guide-tip"><strong>Growth Stage:</strong> ${data.stage_advice}</div>`;
+                }
+                if (data.organic_note) {
+                    html += `<div class="guide-tip"><strong>Organic Supplement:</strong> ${data.organic_note}</div>`;
+                }
+
+                listDiv.innerHTML = html;
+                document.getElementById('fertResults').classList.add('show');
+                loadActivity();
+                loadUsageStats();
+                loadSoilConditions();
+            } catch (e) {
+                alert('Error: ' + e.message + '\nMake sure the Flask backend is running.');
+            } finally {
+                nextBtn.disabled = false;
+                nextBtn.innerHTML = '<i class="fas fa-magic"></i> Get Recommendation';
+            }
+        }
+
+        // Initialize
+        updateStepUI();
+
+        // ---- Activity from MongoDB ----
+        async function loadActivity() {
+            if (!email) return;
+            try {
+                const res = await fetch(`${API}/api/activity/${encodeURIComponent(email)}?limit=10`);
+                const data = await res.json();
+                if (!data.success || data.activities.length === 0) return;
+
+                const el = document.getElementById('recentActivity');
+                let html = '<div class="activity-list">';
+                data.activities.slice(0, 6).forEach((a, i) => {
+                    const labels = {
+                        'login': 'Logged in',
+                        'logout': 'Logged out',
+                        'soil_prediction': 'Soil Analysis - ' + (a.details?.label || ''),
+                        'soil_report': 'Generated Report',
+                        'fertilizer_prediction': 'Fertilizer: ' + (a.details?.fertilizer || ''),
+                        'fertilizer_selector': 'Fertilizer Selector - ' + (a.details?.top_result || ''),
+                        'chat': 'Chatbot conversation'
+                    };
+                    const label = labels[a.action] || a.action;
+                    const time = new Date(a.timestamp).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+                    const dot = a.action.includes('prediction') || a.action.includes('selector') ? 'green' : a.action === 'login' || a.action === 'logout' ? 'blue' : 'amber';
+                    html += `
+                        <div class="activity-item">
+                            <div class="activity-dot ${dot}"></div>
+                            <span class="activity-text">${label}</span>
+                            <span class="activity-time">${time}</span>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                el.innerHTML = html;
+            } catch (e) { /* API unavailable */ }
+        }
+        loadActivity();
+
+        // ---- Usage Statistics & Charts ----
+        let trendChartInstance = null;
+        let donutChartInstance = null;
+
+        function updateRingChart(card, value, maxVal) {
+            const fill = card.querySelector('.ring-fill');
+            const pct = maxVal > 0 ? Math.min((value / maxVal) * 100, 100) : 0;
+            fill.setAttribute('stroke-dasharray', `${pct}, 100`);
+        }
+
+        async function loadUsageStats() {
+            if (!email) return;
+            try {
+                const res = await fetch(`${API}/api/stats/${encodeURIComponent(email)}`);
+                const data = await res.json();
+                if (!data.success) return;
+
+                const s = data.stats;
+                const trend = data.trend;
+                const fertTotal = s.fertilizer_predictions + s.fertilizer_selector;
+                const maxVal = Math.max(s.soil_analysis, s.soil_reports, fertTotal, s.chatbot, 1);
+
+                // Update ring values
+                document.getElementById('statSoilAnalysis').textContent = s.soil_analysis;
+                document.getElementById('statSoilReports').textContent = s.soil_reports;
+                document.getElementById('statFertilizerPred').textContent = fertTotal;
+                document.getElementById('statChatbot').textContent = s.chatbot;
+
+                // Update ring fill animations
+                const cards = document.querySelectorAll('.usage-stat-card');
+                updateRingChart(cards[0], s.soil_analysis, maxVal);
+                updateRingChart(cards[1], s.soil_reports, maxVal);
+                updateRingChart(cards[2], fertTotal, maxVal);
+                updateRingChart(cards[3], s.chatbot, maxVal);
+
+                // Update donut total
+                const total = s.soil_analysis + s.soil_reports + fertTotal + s.chatbot;
+                document.getElementById('donutTotal').textContent = total;
+
+                // Render Trend Chart
+                renderTrendChart(trend);
+
+                // Render Donut Chart
+                renderDonutChart(s.soil_analysis, s.soil_reports, fertTotal, s.chatbot);
+            } catch (e) { /* API unavailable */ }
+        }
+
+        function renderTrendChart(trend) {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            if (trendChartInstance) trendChartInstance.destroy();
+
+            const labels = (trend && trend.labels) ? trend.labels : ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
+            const soil = (trend && trend.soil_analysis) ? trend.soil_analysis : [0, 0, 0, 0, 0, 0];
+            const fert = (trend && trend.fertilizer) ? trend.fertilizer : [0, 0, 0, 0, 0, 0];
+            const chat = (trend && trend.chatbot) ? trend.chatbot : [0, 0, 0, 0, 0, 0];
+
+            trendChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Soil Analysis',
+                            data: soil,
+                            backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                            borderColor: '#22c55e',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            barPercentage: 0.7,
+                            categoryPercentage: 0.7
+                        },
+                        {
+                            label: 'Fertilizer',
+                            data: fert,
+                            backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                            borderColor: '#f59e0b',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            barPercentage: 0.7,
+                            categoryPercentage: 0.7
+                        },
+                        {
+                            label: 'Chatbot',
+                            data: chat,
+                            backgroundColor: 'rgba(139, 92, 246, 0.7)',
+                            borderColor: '#8b5cf6',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            barPercentage: 0.7,
+                            categoryPercentage: 0.7
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { boxWidth: 12, padding: 16, font: { size: 11, weight: '600' } }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1, font: { size: 11 } },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            ticks: { font: { size: 11 } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderDonutChart(soil, fert, chatbot) {
+            const ctx = document.getElementById('donutChart').getContext('2d');
+            if (donutChartInstance) donutChartInstance.destroy();
+
+            const total = soil + fert + chatbot;
+            const hasData = total > 0;
+
+            donutChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Soil Analysis', 'Fertilizer', 'Chatbot'],
+                    datasets: [{
+                        data: hasData ? [soil, fert, chatbot] : [1, 1, 1],
+                        backgroundColor: hasData
+                            ? ['#22c55e', '#f59e0b', '#8b5cf6']
+                            : ['#e5e7eb', '#e5e7eb', '#e5e7eb'],
+                        borderWidth: 0,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 10,
+                                padding: 12,
+                                font: { size: 11, weight: '600' },
+                                color: '#64748b'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (!hasData) return 'No data yet';
+                                    const val = context.parsed;
+                                    const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                                    return `${context.label}: ${val} (${pct}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        loadUsageStats();
+
+        // ---- Recent Soil Conditions ----
+        let soilBarChartInst = null;
+        let soilRadarChartInst = null;
+        let soilAnalysesData = [];
+
+        async function loadSoilConditions() {
+            if (!email) return;
+            try {
+                const res = await fetch(`${API}/api/recent-analyses/${encodeURIComponent(email)}`);
+                const data = await res.json();
+                if (!data.success) return;
+
+                soilAnalysesData = data.analyses;
+                if (soilAnalysesData.length === 0) {
+                    document.getElementById('soilEmptyState').style.display = '';
+                    document.getElementById('soilCondGrid').style.display = 'none';
+                    return;
+                }
+                document.getElementById('soilEmptyState').style.display = 'none';
+                document.getElementById('soilCondGrid').style.display = '';
+                renderSoilHistory();
+                renderSoilCharts(0);
+            } catch (e) { /* API unavailable */ }
+        }
+
+        function renderSoilHistory() {
+            const listEl = document.getElementById('soilHistoryList');
+            let html = '';
+            soilAnalysesData.forEach((a, i) => {
+                const label = a.label || 'Unknown';
+                const conf = a.confidence || '--';
+                const ts = a.timestamp ? new Date(a.timestamp).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+                let badgeClass = 'moderate', badgeText = 'F';
+                if (label === 'Highly Fertile') { badgeClass = 'good'; badgeText = 'HF'; }
+                else if (label === 'Not Fertile') { badgeClass = 'poor'; badgeText = 'NF'; }
+                html += '<div class="soil-history-item ' + (i === 0 ? 'active' : '') + '" onclick="renderSoilCharts(' + i + ')">';
+                html += '<div class="soil-history-badge ' + badgeClass + '">' + badgeText + '</div>';
+                html += '<div class="soil-history-info"><div class="soil-history-label">' + label + '</div>';
+                html += '<div class="soil-history-meta">' + ts + '</div></div>';
+                html += '<div class="soil-history-score">' + conf + '%</div></div>';
+            });
+            listEl.innerHTML = html;
+        }
+
+        function renderSoilCharts(index) {
+            const analysis = soilAnalysesData[index];
+            if (!analysis) return;
+            const inputs = analysis.inputs || {};
+            const keys = ['n','p','k','ph','ec','oc','s','zn','fe','cu','mn','b'];
+            const labels = ['N','P','K','pH','EC','OC','S','Zn','Fe','Cu','Mn','B'];
+            const rawVals = keys.map(k => parseFloat(inputs[k]) || 0);
+            const maxRefs = [800,50,700,8.5,1.5,1.5,50,5,15,3,25,3.5];
+            const pctVals = rawVals.map((v,i) => maxRefs[i]>0 ? Math.min((v/maxRefs[i])*100,100) : 0);
+            const optLow = [280,10,200,6.0,0.2,0.5,10,1.0,4.0,0.5,4.0,0.5];
+            const optHigh = [560,25,500,7.5,0.8,1.0,30,3.0,10.0,1.5,15.0,2.0];
+            const barColors = rawVals.map((v,i) => {
+                if(v>=optLow[i]&&v<=optHigh[i]) return '#22c55e';
+                if(v<optLow[i]*0.5||v>optHigh[i]*1.5) return '#ef4444';
+                return '#f59e0b';
+            });
+            const radarScores = rawVals.map((v,i) => {
+                if(v>=optLow[i]&&v<=optHigh[i]) return 100;
+                if(v<optLow[i]*0.5||v>optHigh[i]*1.5) return 20;
+                return 60;
+            });
+            document.querySelectorAll('.soil-history-item').forEach((el,i) => el.classList.toggle('active',i===index));
+            const barCtx = document.getElementById('soilBarChart').getContext('2d');
+            if(soilBarChartInst) soilBarChartInst.destroy();
+            soilBarChartInst = new Chart(barCtx,{type:'bar',data:{labels:labels,datasets:[{data:pctVals,backgroundColor:barColors,borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,ticks:{stepSize:25,font:{size:10}},grid:{color:'#f1f5f9'}},x:{ticks:{font:{size:9}},grid:{display:false}}}}});
+            const radarCtx = document.getElementById('soilRadarChart').getContext('2d');
+            if(soilRadarChartInst) soilRadarChartInst.destroy();
+            soilRadarChartInst = new Chart(radarCtx,{type:'radar',data:{labels:labels,datasets:[{data:radarScores,backgroundColor:'rgba(34,197,94,0.15)',borderColor:'#22c55e',borderWidth:2,pointBackgroundColor:barColors,pointBorderColor:'#fff',pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{beginAtZero:true,max:100,ticks:{stepSize:25,display:false},pointLabels:{font:{size:9}},grid:{color:'#e5e7eb'}}}}});
+        }
+        window.renderSoilCharts = renderSoilCharts;
+        loadSoilConditions();
+
+        // ---- Chatbot ----
+        const chatFab = document.getElementById('chatFab');
+        const chatWindow = document.getElementById('chatWindow');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const chatSendBtn = document.getElementById('chatSendBtn');
+
+        document.getElementById('openChatAction').addEventListener('click', () => {
+            chatWindow.classList.add('open');
+            if (chatMessages.children.length === 0) appendBotMessage("Hello! I'm your **Soil Health Assistant**. Ask me anything about soil fertility, fertilizers, crop management, or nutrient deficiencies.");
+        });
+
+        chatFab.addEventListener('click', () => {
+            chatWindow.classList.toggle('open');
+            if (chatWindow.classList.contains('open') && chatMessages.children.length === 0) {
+                appendBotMessage("Hello! I'm your **Soil Health Assistant**. Ask me anything about soil fertility, fertilizers, crop management, or nutrient deficiencies.");
+            }
+        });
+
+        function appendMessage(text, sender) {
+            const div = document.createElement('div');
+            div.className = `chat-msg ${sender}`;
+            div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function appendBotMessage(text) { appendMessage(text, 'bot'); }
+
+        function showTyping() {
+            const div = document.createElement('div');
+            div.className = 'chat-msg typing';
+            div.id = 'typingIndicator';
+            div.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTyping() {
+            const el = document.getElementById('typingIndicator');
+            if (el) el.remove();
+        }
+
+        async function sendMessage() {
+            const msg = chatInput.value.trim();
+            if (!msg) return;
+            appendMessage(msg, 'user');
+            chatInput.value = '';
+            chatSendBtn.disabled = true;
+            showTyping();
+            try {
+                const res = await fetch(`${API}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg, email: email })
+                });
+                const data = await res.json();
+                removeTyping();
+                appendBotMessage(data.success ? data.response : 'Sorry, something went wrong.');
+            } catch {
+                removeTyping();
+                appendBotMessage("Can't connect to server. Make sure Flask is running on port 5000.");
+            } finally {
+                chatSendBtn.disabled = false;
+                chatInput.focus();
+            }
+        }
+
+        chatSendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } });
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </body>
 </html>
-

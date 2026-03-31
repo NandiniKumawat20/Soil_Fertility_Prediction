@@ -162,6 +162,75 @@ body {
     box-shadow: var(--shadow-lg);
 }
 
+.hero-illustration {
+    width: 320px;
+    height: 320px;
+    position: relative;
+    animation: float 3s ease-in-out infinite;
+}
+
+.hero-soil-layers {
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+}
+
+.soil-layer {
+    width: 100%;
+}
+
+.layer-grass {
+    height: 20%;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: rgba(255,255,255,0.8);
+}
+
+.layer-top {
+    height: 25%;
+    background: linear-gradient(180deg, #4a2c0a, #5c3a12);
+}
+
+.layer-mid {
+    height: 30%;
+    background: linear-gradient(180deg, #6b4226, #7a5030);
+}
+
+.layer-deep {
+    height: 25%;
+    background: linear-gradient(180deg, #8b6914, #a07828);
+}
+
+.hero-nutrient {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: #fff;
+    animation: floatSlow 4s ease-in-out infinite;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.n-dot { background: #22c55e; top: 35%; left: 20%; animation-delay: 0s; }
+.p-dot { background: #3b82f6; top: 55%; left: 55%; animation-delay: 1.3s; }
+.k-dot { background: #f59e0b; top: 70%; left: 30%; animation-delay: 2.6s; }
+
+@keyframes floatSlow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
 @keyframes float {
     0%, 100% {
         transform: translateY(0);

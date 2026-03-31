@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fertilizer Selector - Soil Fertility Prediction</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .fert-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+            padding: 2rem 1rem;
+        }
+
+        .fert-card {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            padding: 2rem;
+        }
+
+        .fert-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .fert-top h1 {
+            font-size: 1.8rem;
+            color: var(--text-dark);
+        }
+
+        .back-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover { text-decoration: underline; }
+
+        /* Step indicator */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .step-dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            background: #e5e7eb;
+            color: #9ca3af;
+            transition: all 0.3s;
+        }
+
+        .step-dot.active {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(34, 197, 94, 0.3);
+        }
+
+        .step-dot.done {
+            background: #bbf7d0;
+            color: #166534;
+        }
+
+        /* Question steps */
+        .question-step {
+            display: none;
+        }
+
+        .question-step.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .step-subtitle {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .option-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            background: #fff;
+        }
+
+        .option-card:hover {
+            border-color: #86efac;
+            background: #f0fdf4;
+        }
+
+        .option-card.selected {
+            border-color: #22c55e;
+            background: #f0fdf4;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+        }
+
+        .option-card .opt-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .option-card .opt-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .option-card .opt-desc {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 0.2rem;
+        }
+
+        /* Range sliders */
+        .range-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .range-group label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.4rem;
+        }
+
+        .range-group label span {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .range-group input[type="range"] {
+            width: 100%;
+            accent-color: #22c55e;
+            height: 6px;
+        }
+
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 0.2rem;
+        }
+
+        /* Navigation */
+        .step-nav {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-nav {
+            padding: 0.7rem 1.5rem;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .btn-prev {
+            background: #fff;
+            color: #374151;
+            border: 2px solid #e5e7eb !important;
+        }
+
+        .btn-prev:hover { background: #f3f4f6; border-color: #d1d5db !important; }
+
+        .btn-next {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+        }
+
+        .btn-next:hover { box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); }
+
+        .btn-next:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Result section */
+        .result-section {
+            display: none;
+            margin-top: 1.5rem;
+        }
+
+        .result-section.show { display: block; }
+
+        .result-hero {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-hero .fert-icon {
+            font-size: 2.5rem;
+            color: #16a34a;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-hero h2 {
+            font-size: 1.6rem;
+            color: #166534;
+            margin-bottom: 0.25rem;
+        }
+
+        .result-hero .npk-badge {
+            display: inline-block;
+            background: #dcfce7;
+            color: #166534;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-top: 0.4rem;
+        }
+
+        .result-hero .confidence {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        .info-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid #22c55e;
+        }
+
+        .info-card h4 {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            margin-bottom: 0.35rem;
+        }
+
+        .info-card p {
+            font-size: 0.88rem;
+            color: #374151;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .info-card.warning {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .info-card.info {
+            border-left-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .alt-recommendations {
+            margin-top: 1.5rem;
+        }
+
+        .alt-recommendations h3 {
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .alt-fert-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .alt-fert-rank {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f0fdf4;
+            color: #16a34a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .alt-fert-info { flex: 1; }
+
+        .alt-fert-info strong {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+
+        .alt-fert-info .alt-npk {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        .alt-fert-conf {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+        .new-analysis-btn {
+            display: block;
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 0.75rem;
+            border-radius: 10px;
+            border: 2px solid var(--primary-color);
+            background: transparent;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .new-analysis-btn:hover {
+            background: #f0fdf4;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .fert-card { padding: 1.2rem; }
+            .option-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <main class="fert-page">
+        <section class="fert-card">
+            <div class="fert-top">
+                <h1><i class="fas fa-seedling" style="color:#22c55e"></i> Fertilizer Selector</h1>
+                <a href="dashboard.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+            </div>
+
+            <div class="step-indicator" id="stepIndicator"></div>
+
+            <!-- Step 1: Soil pH -->
+            <div class="question-step" data-step="1">
+                <div class="step-title">What is the soil pH?</div>
+                <div class="step-subtitle">This helps decide if soil is acidic, neutral, or alkaline.</div>
+                <div class="option-grid" data-name="soil_ph">
+                    <div class="option-card" data-value="acidic">
+                        <div class="opt-icon"><i class="fas fa-lemon" style="color:#ef4444"></i></div>
+                        <div class="opt-label">Acidic</div>
+                        <div class="opt-desc">pH below 6.0</div>
+                    </div>
+                    <div class="option-card" data-value="neutral">
+                        <div class="opt-icon"><i class="fas fa-circle-check" style="color:#22c55e"></i></div>
+                        <div class="opt-label">Neutral</div>
+                        <div class="opt-desc">pH 6.0 - 7.5</div>
+                    </div>
+                    <div class="option-card" data-value="alkaline">
+                        <div class="opt-icon"><i class="fas fa-fire" style="color:#f59e0b"></i></div>
+                        <div class="opt-label">Alkaline</div>
+                        <div class="opt-desc">pH above 7.5</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Nutrient levels -->
+            <div class="question-step" data-step="2">
+                <div class="step-title">Which nutrients are lacking?</div>
+                <div class="step-subtitle">Adjust sliders based on your soil test results (kg/ha).</div>
+                <div class="range-group">
+                    <label>Nitrogen (N) <span id="nVal">20</span></label>
+                    <input type="range" id="nitrogen" min="0" max="50" value="20">
+                    <div class="range-labels"><span>0 (Deficient)</span><span>50 (High)</span></div>
+                </div>
+                <div class="range-group">
+                    <label>Phosphorus (P) <span id="pVal">10</span></label>
+                    <input type="range" id="phosphorus" min="0" max="50" value="10">
+                    <div class="range-labels"><span>0 (Deficient)</span><span>50 (High)</span></div>
+                </div>
+                <div class="range-group">
+                    <label>Potassium (K) <span id="kVal">5</span></label>
+                    <input type="range" id="potassium" min="0" max="50" value="5">
+                    <div class="range-labels"><span>0 (Deficient)</span><span>50 (High)</span></div>
+                </div>
+            </div>
+
+            <!-- Step 3: Crop type -->
+            <div class="question-step" data-step="3">
+                <div class="step-title">What type of crop are you growing?</div>
+                <div class="step-subtitle">Different crops need different nutrients.</div>
+                <div class="option-grid" data-name="crop_type">
+                    <div class="option-card" data-value="Wheat"><div class="opt-icon"><i class="fas fa-wheat-awn" style="color:#d97706"></i></div><div class="opt-label">Wheat</div></div>
+                    <div class="option-card" data-value="Paddy"><div class="opt-icon"><i class="fas fa-seedling" style="color:#16a34a"></i></div><div class="opt-label">Paddy (Rice)</div></div>
+                    <div class="option-card" data-value="Maize"><div class="opt-icon"><i class="fas fa-seedling" style="color:#ca8a04"></i></div><div class="opt-label">Maize</div></div>
+                    <div class="option-card" data-value="Cotton"><div class="opt-icon"><i class="fas fa-cloud" style="color:#a78bfa"></i></div><div class="opt-label">Cotton</div></div>
+                    <div class="option-card" data-value="Sugarcane"><div class="opt-icon"><i class="fas fa-candy-cane" style="color:#059669"></i></div><div class="opt-label">Sugarcane</div></div>
+                    <div class="option-card" data-value="Barley"><div class="opt-icon"><i class="fas fa-wheat-awn" style="color:#b45309"></i></div><div class="opt-label">Barley</div></div>
+                    <div class="option-card" data-value="Millets"><div class="opt-icon"><i class="fas fa-seedling" style="color:#84cc16"></i></div><div class="opt-label">Millets</div></div>
+                    <div class="option-card" data-value="Pulses"><div class="opt-icon"><i class="fas fa-circle" style="color:#65a30d"></i></div><div class="opt-label">Pulses</div></div>
+                    <div class="option-card" data-value="Oil seeds"><div class="opt-icon"><i class="fas fa-droplet" style="color:#f59e0b"></i></div><div class="opt-label">Oil Seeds</div></div>
+                    <div class="option-card" data-value="Ground Nuts"><div class="opt-icon"><i class="fas fa-circle-dot" style="color:#92400e"></i></div><div class="opt-label">Ground Nuts</div></div>
+                    <div class="option-card" data-value="Tobacco"><div class="opt-icon"><i class="fas fa-leaf" style="color:#6b7280"></i></div><div class="opt-label">Tobacco</div></div>
+                </div>
+            </div>
+
+            <!-- Step 4: Growth stage -->
+            <div class="question-step" data-step="4">
+                <div class="step-title">What is the current growth stage?</div>
+                <div class="step-subtitle">Nutrient needs change at different stages.</div>
+                <div class="option-grid" data-name="growth_stage">
+                    <div class="option-card" data-value="seedling">
+                        <div class="opt-icon"><i class="fas fa-seedling" style="color:#22c55e"></i></div>
+                        <div class="opt-label">Seedling</div>
+                        <div class="opt-desc">Just planted / germinating</div>
+                    </div>
+                    <div class="option-card" data-value="vegetative">
+                        <div class="opt-icon"><i class="fas fa-leaf" style="color:#16a34a"></i></div>
+                        <div class="opt-label">Vegetative</div>
+                        <div class="opt-desc">Growing leaves & stems</div>
+                    </div>
+                    <div class="option-card" data-value="flowering">
+                        <div class="opt-icon"><i class="fas fa-sun" style="color:#f59e0b"></i></div>
+                        <div class="opt-label">Flowering</div>
+                        <div class="opt-desc">Producing flowers</div>
+                    </div>
+                    <div class="option-card" data-value="fruiting">
+                        <div class="opt-icon"><i class="fas fa-apple-whole" style="color:#ef4444"></i></div>
+                        <div class="opt-label">Fruiting</div>
+                        <div class="opt-desc">Producing grain / fruit</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Soil type -->
+            <div class="question-step" data-step="5">
+                <div class="step-title">What is the soil type?</div>
+                <div class="step-subtitle">Soil type affects nutrient retention and drainage.</div>
+                <div class="option-grid" data-name="soil_type">
+                    <div class="option-card" data-value="Sandy">
+                        <div class="opt-icon"><i class="fas fa-circle" style="color:#d4a574"></i></div>
+                        <div class="opt-label">Sandy</div>
+                        <div class="opt-desc">Drains fast, low retention</div>
+                    </div>
+                    <div class="option-card" data-value="Loamy">
+                        <div class="opt-icon"><i class="fas fa-circle" style="color:#8b6914"></i></div>
+                        <div class="opt-label">Loamy</div>
+                        <div class="opt-desc">Best for most crops</div>
+                    </div>
+                    <div class="option-card" data-value="Clayey">
+                        <div class="opt-icon"><i class="fas fa-circle" style="color:#92400e"></i></div>
+                        <div class="opt-label">Clayey</div>
+                        <div class="opt-desc">High retention, slow drainage</div>
+                    </div>
+                    <div class="option-card" data-value="Black">
+                        <div class="opt-icon"><i class="fas fa-circle" style="color:#1f2937"></i></div>
+                        <div class="opt-label">Black</div>
+                        <div class="opt-desc">Rich in nutrients, cotton soil</div>
+                    </div>
+                    <div class="option-card" data-value="Red">
+                        <div class="opt-icon"><i class="fas fa-circle" style="color:#dc2626"></i></div>
+                        <div class="opt-label">Red</div>
+                        <div class="opt-desc">Iron-rich, well drained</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 6: Weather -->
+            <div class="question-step" data-step="6">
+                <div class="step-title">What are the weather conditions?</div>
+                <div class="step-subtitle">Temperature, humidity and moisture affect fertilizer efficiency.</div>
+                <div class="range-group">
+                    <label>Temperature <span id="tempVal">28</span>&deg;C</label>
+                    <input type="range" id="temperature" min="10" max="45" value="28">
+                    <div class="range-labels"><span>10&deg;C (Cold)</span><span>45&deg;C (Hot)</span></div>
+                </div>
+                <div class="range-group">
+                    <label>Humidity <span id="humVal">55</span>%</label>
+                    <input type="range" id="humidity" min="10" max="100" value="55">
+                    <div class="range-labels"><span>10% (Dry)</span><span>100% (Humid)</span></div>
+                </div>
+                <div class="range-group">
+                    <label>Soil Moisture <span id="moistVal">40</span>%</label>
+                    <input type="range" id="moisture" min="10" max="90" value="40">
+                    <div class="range-labels"><span>10% (Dry)</span><span>90% (Wet)</span></div>
+                </div>
+            </div>
+
+            <!-- Step 7: Preference -->
+            <div class="question-step" data-step="7">
+                <div class="step-title">Do you prefer organic or chemical fertilizer?</div>
+                <div class="step-subtitle">Based on your farming method and sustainability goals.</div>
+                <div class="option-grid" data-name="preference">
+                    <div class="option-card" data-value="chemical">
+                        <div class="opt-icon"><i class="fas fa-flask" style="color:#3b82f6"></i></div>
+                        <div class="opt-label">Chemical</div>
+                        <div class="opt-desc">Fast-acting, precise NPK</div>
+                    </div>
+                    <div class="option-card" data-value="organic">
+                        <div class="opt-icon"><i class="fas fa-leaf" style="color:#22c55e"></i></div>
+                        <div class="opt-label">Organic</div>
+                        <div class="opt-desc">Natural, sustainable</div>
+                    </div>
+                    <div class="option-card" data-value="both">
+                        <div class="opt-icon"><i class="fas fa-arrows-rotate" style="color:#8b5cf6"></i></div>
+                        <div class="opt-label">Integrated</div>
+                        <div class="opt-desc">Best of both methods</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="step-nav" id="stepNav">
+                <button class="btn-nav btn-prev" id="prevBtn" style="visibility:hidden"><i class="fas fa-arrow-left"></i> Previous</button>
+                <button class="btn-nav btn-next" id="nextBtn">Next <i class="fas fa-arrow-right"></i></button>
+            </div>
+
+            <!-- Results -->
+            <div class="result-section" id="resultSection"></div>
+        </section>
+    </main>
+
+    <script>
+        const TOTAL_STEPS = 7;
+        let currentStep = 1;
+        const answers = {};
+
+        // Build step indicator
+        const indicator = document.getElementById('stepIndicator');
+        for (let i = 1; i <= TOTAL_STEPS; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'step-dot' + (i === 1 ? ' active' : '');
+            dot.textContent = i;
+            dot.id = `stepDot${i}`;
+            indicator.appendChild(dot);
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.question-step').forEach(s => s.classList.remove('active'));
+            const target = document.querySelector(`.question-step[data-step="${step}"]`);
+            if (target) target.classList.add('active');
+
+            for (let i = 1; i <= TOTAL_STEPS; i++) {
+                const dot = document.getElementById(`stepDot${i}`);
+                dot.className = 'step-dot';
+                if (i < step) dot.classList.add('done');
+                else if (i === step) dot.classList.add('active');
+            }
+
+            const prevBtn = document.getElementById('prevBtn');
+            if (step === 1) {
+                prevBtn.style.visibility = 'hidden';
+            } else {
+                prevBtn.style.visibility = 'visible';
+            }
+
+            const nextBtn = document.getElementById('nextBtn');
+            if (step === TOTAL_STEPS) {
+                nextBtn.innerHTML = '<i class="fas fa-magic"></i> Get Recommendation';
+            } else {
+                nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+            }
+        }
+
+        // Option card selection
+        document.querySelectorAll('.option-grid').forEach(grid => {
+            grid.querySelectorAll('.option-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    grid.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    answers[grid.dataset.name] = card.dataset.value;
+                });
+            });
+        });
+
+        // Slider value display
+        document.getElementById('nitrogen').addEventListener('input', e => {
+            document.getElementById('nVal').textContent = e.target.value;
+            answers.nitrogen = e.target.value;
+        });
+        document.getElementById('phosphorus').addEventListener('input', e => {
+            document.getElementById('pVal').textContent = e.target.value;
+            answers.phosphorus = e.target.value;
+        });
+        document.getElementById('potassium').addEventListener('input', e => {
+            document.getElementById('kVal').textContent = e.target.value;
+            answers.potassium = e.target.value;
+        });
+        document.getElementById('temperature').addEventListener('input', e => {
+            document.getElementById('tempVal').textContent = e.target.value;
+            answers.temperature = e.target.value;
+        });
+        document.getElementById('humidity').addEventListener('input', e => {
+            document.getElementById('humVal').textContent = e.target.value;
+            answers.humidity = e.target.value;
+        });
+        document.getElementById('moisture').addEventListener('input', e => {
+            document.getElementById('moistVal').textContent = e.target.value;
+            answers.moisture = e.target.value;
+        });
+
+        // Init slider defaults
+        answers.nitrogen = 20; answers.phosphorus = 10; answers.potassium = 5;
+        answers.temperature = 28; answers.humidity = 55; answers.moisture = 40;
+
+        function isStepValid(step) {
+            const stepEl = document.querySelector(`.question-step[data-step="${step}"]`);
+            const grid = stepEl.querySelector('.option-grid');
+            if (grid) {
+                return !!answers[grid.dataset.name];
+            }
+            return true; // slider steps always valid
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', async () => {
+            if (currentStep < TOTAL_STEPS) {
+                if (!isStepValid(currentStep)) {
+                    alert('Please select an option before proceeding.');
+                    return;
+                }
+                currentStep++;
+                showStep(currentStep);
+            } else {
+                // Submit
+                if (!isStepValid(currentStep)) {
+                    alert('Please select an option before proceeding.');
+                    return;
+                }
+                await submitForm();
+            }
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        });
+
+        async function submitForm() {
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = true;
+            nextBtn.innerHTML = '<span class="spinner"></span> Analyzing...';
+
+            try {
+                const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+                if (profile.email) answers.email = profile.email;
+
+                const res = await fetch('http://localhost:5000/fertilizer-predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(answers)
+                });
+                const data = await res.json();
+
+                if (!data.success) throw new Error(data.error || 'Prediction failed');
+
+                renderResults(data);
+            } catch (err) {
+                alert('Error: ' + err.message + '\nMake sure the Flask backend is running on port 5000.');
+            } finally {
+                nextBtn.disabled = false;
+                nextBtn.innerHTML = '<i class="fas fa-magic"></i> Get Recommendation';
+            }
+        }
+
+        function renderResults(data) {
+            document.getElementById('stepNav').style.display = 'none';
+            document.querySelectorAll('.question-step').forEach(s => s.classList.remove('active'));
+            document.getElementById('stepIndicator').style.display = 'none';
+
+            // Track fertilizer picks
+            const pickCount = parseInt(localStorage.getItem('fertilizerPickCount') || '0') + 1;
+            localStorage.setItem('fertilizerPickCount', pickCount);
+
+            const section = document.getElementById('resultSection');
+            const primary = data.top_recommendations[0] || {};
+
+            let html = `
+                <div class="result-hero">
+                    <div class="fert-icon"><i class="fas fa-seedling"></i></div>
+                    <h2>${primary.name || 'N/A'}</h2>
+                    <div class="npk-badge">NPK: ${primary.npk || ''}</div>
+                    <div class="confidence">Match Confidence: ${primary.confidence || 0}%</div>
+                </div>
+                <div class="info-card">
+                    <h4><i class="fas fa-info-circle"></i> Description</h4>
+                    <p>${primary.description || ''}</p>
+                </div>
+                <div class="info-card">
+                    <h4><i class="fas fa-clipboard-list"></i> Application Guide</h4>
+                    <p>${primary.application || ''}</p>
+                </div>
+                <div class="info-card">
+                    <h4><i class="fas fa-wheat-awn"></i> Best For</h4>
+                    <p>${primary.crops || ''}</p>
+                </div>
+                <div class="info-card">
+                    <h4><i class="fas fa-lightbulb"></i> Pro Tips</h4>
+                    <p>${primary.tips || ''}</p>
+                </div>
+            `;
+
+            if (data.ph_advice) {
+                html += `<div class="info-card warning"><h4><i class="fas fa-flask"></i> pH Advice</h4><p>${data.ph_advice}</p></div>`;
+            }
+            if (data.stage_advice) {
+                html += `<div class="info-card info"><h4><i class="fas fa-clock"></i> Growth Stage Advice</h4><p>${data.stage_advice}</p></div>`;
+            }
+            if (data.organic_note) {
+                html += `<div class="info-card" style="border-left-color:#22c55e;background:#f0fdf4;"><h4><i class="fas fa-leaf"></i> Organic Supplement</h4><p>${data.organic_note}</p></div>`;
+            }
+
+            if (data.top_recommendations.length > 1) {
+                html += `<div class="alt-recommendations"><h3><i class="fas fa-list"></i> Alternative Options</h3>`;
+                data.top_recommendations.slice(1).forEach((rec, i) => {
+                    html += `
+                        <div class="alt-fert-card">
+                            <div class="alt-fert-rank">${i + 2}</div>
+                            <div class="alt-fert-info">
+                                <strong>${rec.name}</strong>
+                                <div class="alt-npk">NPK: ${rec.npk}</div>
+                            </div>
+                            <div class="alt-fert-conf">${rec.confidence}%</div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            html += `<button class="new-analysis-btn" onclick="resetForm()"><i class="fas fa-redo"></i> Start New Selection</button>`;
+
+            section.innerHTML = html;
+            section.classList.add('show');
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function resetForm() {
+            currentStep = 1;
+            Object.keys(answers).forEach(k => {
+                if (['nitrogen','phosphorus','potassium','temperature','humidity','moisture'].includes(k)) return;
+                delete answers[k];
+            });
+            answers.nitrogen = 20; answers.phosphorus = 10; answers.potassium = 5;
+            answers.temperature = 28; answers.humidity = 55; answers.moisture = 40;
+
+            document.getElementById('nitrogen').value = 20;
+            document.getElementById('phosphorus').value = 10;
+            document.getElementById('potassium').value = 5;
+            document.getElementById('temperature').value = 28;
+            document.getElementById('humidity').value = 55;
+            document.getElementById('moisture').value = 40;
+            document.getElementById('nVal').textContent = 20;
+            document.getElementById('pVal').textContent = 10;
+            document.getElementById('kVal').textContent = 5;
+            document.getElementById('tempVal').textContent = 28;
+            document.getElementById('humVal').textContent = 55;
+            document.getElementById('moistVal').textContent = 40;
+
+            document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('resultSection').classList.remove('show');
+            document.getElementById('resultSection').innerHTML = '';
+            document.getElementById('stepNav').style.display = 'flex';
+            document.getElementById('stepIndicator').style.display = 'flex';
+
+            showStep(1);
+        }
+
+        showStep(1);
+    </script>
+</body>
+</html>

@@ -6,6 +6,7 @@
     <title>Soil Analysis - Soil Fertility Prediction</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <style>
         .analysis-page {
             min-height: 100vh;
@@ -84,7 +85,7 @@
 
         .result-box {
             margin-top: 1.5rem;
-            padding: 1rem;
+            padding: 1.5rem;
             border-radius: 10px;
             border-left: 4px solid var(--secondary-color);
             background: #f0f9ff;
@@ -96,9 +97,295 @@
             display: block;
         }
 
+        .result-box.fertile {
+            border-left-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .result-box.not-fertile {
+            border-left-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .result-box.highly-fertile {
+            border-left-color: #059669;
+            background: #ecfdf5;
+        }
+
+        .result-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-confidence {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 0.75rem;
+        }
+
+        .result-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .prob-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .prob-label {
+            width: 120px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .prob-bar-bg {
+            flex: 1;
+            height: 20px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .prob-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+
+        .prob-bar-fill.green { background: #22c55e; }
+        .prob-bar-fill.yellow { background: #eab308; }
+        .prob-bar-fill.red { background: #ef4444; }
+
+        .prob-value {
+            width: 50px;
+            text-align: right;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .report-btn-container {
+            display: none;
+            margin-top: 1.5rem;
+        }
+
+        .report-btn-container.show {
+            display: block;
+        }
+
+        .report-section {
+            display: none;
+            margin-top: 2rem;
+            border-top: 2px solid #e5e7eb;
+            padding-top: 2rem;
+        }
+
+        .report-section.show {
+            display: block;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .report-header h2 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        .score-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .score-circle.good { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .score-circle.moderate { background: linear-gradient(135deg, #eab308, #ca8a04); }
+        .score-circle.poor { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+        .score-details h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .score-details p {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .issue-badges {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .issue-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .issue-badge.critical {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .issue-badge.warning {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+
+        .issue-badge.good {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-container {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .chart-container h3 {
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .recommendations-list {
+            margin-top: 1.5rem;
+        }
+
+        .recommendations-list h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .rec-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid #e5e7eb;
+        }
+
+        .rec-card.critical {
+            border-left-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .rec-card.warning {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .rec-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .rec-card-header strong {
+            font-size: 0.95rem;
+        }
+
+        .rec-card-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+        }
+
+        .rec-card-status.critical {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .rec-card-status.warning {
+            background: #fde68a;
+            color: #92400e;
+        }
+
+        .rec-card p {
+            font-size: 0.9rem;
+            color: #374151;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .rec-card .nutrient-value {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
         @media (max-width: 992px) {
             .feature-grid {
                 grid-template-columns: repeat(3, minmax(120px, 1fr));
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -109,6 +396,11 @@
 
             .feature-grid {
                 grid-template-columns: repeat(2, minmax(120px, 1fr));
+            }
+
+            .score-card {
+                flex-direction: column;
+                text-align: center;
             }
         }
     </style>
@@ -146,23 +438,336 @@
             </form>
 
             <div class="result-box" id="analysisResult"></div>
+
+            <div class="report-btn-container" id="reportBtnContainer">
+                <button type="button" class="btn btn-primary" id="generateReportBtn"><i class="fas fa-chart-bar"></i> Generate Detailed Report</button>
+            </div>
+
+            <div class="report-section" id="reportSection">
+                <div class="report-header">
+                    <h2><i class="fas fa-clipboard-list"></i> Detailed Soil Report</h2>
+                </div>
+
+                <div class="score-card">
+                    <div class="score-circle" id="overallScore">--</div>
+                    <div class="score-details">
+                        <h3 id="scoreTitle">Overall Soil Health</h3>
+                        <p id="scoreDesc">Analyzing your soil data...</p>
+                    </div>
+                </div>
+
+                <div class="issue-badges" id="issueBadges"></div>
+
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3>Nutrient Levels Overview</h3>
+                        <canvas id="nutrientChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Nutrient Balance (Radar)</h3>
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="recommendations-list" id="recommendationsList">
+                    <h3><i class="fas fa-lightbulb"></i> Recommendations to Improve Soil</h3>
+                </div>
+            </div>
         </section>
     </main>
 
     <script>
         const analysisForm = document.getElementById('analysisForm');
         const resultBox = document.getElementById('analysisResult');
+        const submitBtn = analysisForm.querySelector('button[type="submit"]');
+        const reportBtnContainer = document.getElementById('reportBtnContainer');
+        const reportSection = document.getElementById('reportSection');
+        const generateReportBtn = document.getElementById('generateReportBtn');
+        let lastAnalysisData = null;
+        let nutrientChartInstance = null;
+        let radarChartInstance = null;
+        const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+        const userEmail = userProfile.email || '';
 
-        analysisForm.addEventListener('submit', (e) => {
+        analysisForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const formData = new FormData(analysisForm);
             const values = Object.fromEntries(formData.entries());
             localStorage.setItem('lastAnalysisInput', JSON.stringify(values));
+            lastAnalysisData = values;
 
-            resultBox.textContent = 'Input captured successfully. Connect this page to your prediction model/API to generate analysis output.';
-            resultBox.classList.add('show');
+            // Hide report section and button on new analysis
+            reportBtnContainer.classList.remove('show');
+            reportSection.classList.remove('show');
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Analyzing...';
+            resultBox.className = 'result-box show';
+            resultBox.innerHTML = 'Running ML analysis on your soil data...';
+
+            try {
+                const predictData = { ...values };
+                if (userEmail) predictData.email = userEmail;
+
+                const response = await fetch('http://localhost:5000/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(predictData)
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Prediction failed');
+                }
+
+                // Determine result class
+                let resultClass = 'fertile';
+                if (data.prediction === 0) resultClass = 'not-fertile';
+                else if (data.prediction === 2) resultClass = 'highly-fertile';
+
+                // Build probability bars
+                const barColors = { 'Not Fertile': 'red', 'Fertile': 'yellow', 'Highly Fertile': 'green' };
+                let probBars = '';
+                for (const [label, prob] of Object.entries(data.probabilities)) {
+                    probBars += `
+                        <div class="prob-bar-container">
+                            <span class="prob-label">${label}</span>
+                            <div class="prob-bar-bg">
+                                <div class="prob-bar-fill ${barColors[label]}" style="width: ${prob}%"></div>
+                            </div>
+                            <span class="prob-value">${prob}%</span>
+                        </div>
+                    `;
+                }
+
+                resultBox.className = `result-box show ${resultClass}`;
+                resultBox.innerHTML = `
+                    <div class="result-title">${data.label}</div>
+                    <div class="result-confidence">Confidence: ${data.confidence}%</div>
+                    <div class="result-description">${data.description}</div>
+                    <div style="margin-top:0.75rem;">
+                        <strong style="font-size:0.9rem;">Prediction Probabilities:</strong>
+                        ${probBars}
+                    </div>
+                `;
+
+                // Show Generate Report button
+                reportBtnContainer.classList.add('show');
+
+                // Save to analysis history
+                const history = JSON.parse(localStorage.getItem('analysesHistory') || '[]');
+                history.push({
+                    label: data.label,
+                    score: data.prediction === 2 ? 90 : data.prediction === 1 ? 60 : 25,
+                    confidence: data.confidence,
+                    time: new Date().toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+                });
+                localStorage.setItem('analysesHistory', JSON.stringify(history));
+
+            } catch (err) {
+                resultBox.className = 'result-box show not-fertile';
+                resultBox.innerHTML = `<strong>Error:</strong> ${err.message}. Make sure the Flask backend is running on port 5000.`;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-flask"></i> Do Analysis';
+            }
         });
+
+        generateReportBtn.addEventListener('click', async () => {
+            if (!lastAnalysisData) return;
+
+            generateReportBtn.disabled = true;
+            generateReportBtn.innerHTML = '<span class="spinner"></span> Generating...';
+
+            try {
+                const reportData = { ...lastAnalysisData };
+                if (userEmail) reportData.email = userEmail;
+
+                const response = await fetch('http://localhost:5000/report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reportData)
+                });
+
+                const report = await response.json();
+
+                if (!report.success) {
+                    throw new Error(report.error || 'Report generation failed');
+                }
+
+                renderReport(report);
+                reportSection.classList.add('show');
+                reportSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            } catch (err) {
+                alert('Failed to generate report: ' + err.message);
+            } finally {
+                generateReportBtn.disabled = false;
+                generateReportBtn.innerHTML = '<i class="fas fa-chart-bar"></i> Generate Detailed Report';
+            }
+        });
+
+        function renderReport(report) {
+            // Save report data for dashboard
+            localStorage.setItem('lastReportData', JSON.stringify(report));
+
+            // Overall score
+            const scoreEl = document.getElementById('overallScore');
+            const scoreTitle = document.getElementById('scoreTitle');
+            const scoreDesc = document.getElementById('scoreDesc');
+            const score = report.overall_score;
+
+            scoreEl.textContent = Math.round(score) + '%';
+            if (score >= 60) {
+                scoreEl.className = 'score-circle good';
+                scoreTitle.textContent = 'Good Soil Health';
+                scoreDesc.textContent = `${report.total_issues} issue(s) found. Your soil is in decent condition with room for improvement.`;
+            } else if (score >= 35) {
+                scoreEl.className = 'score-circle moderate';
+                scoreTitle.textContent = 'Moderate Soil Health';
+                scoreDesc.textContent = `${report.total_issues} issue(s) found. Several nutrients need attention to improve fertility.`;
+            } else {
+                scoreEl.className = 'score-circle poor';
+                scoreTitle.textContent = 'Poor Soil Health';
+                scoreDesc.textContent = `${report.total_issues} issue(s) found. Significant corrective action is needed.`;
+            }
+
+            // Issue badges
+            const badgesEl = document.getElementById('issueBadges');
+            badgesEl.innerHTML = `
+                <span class="issue-badge critical"><i class="fas fa-exclamation-triangle"></i> ${report.critical_issues} Critical</span>
+                <span class="issue-badge warning"><i class="fas fa-exclamation-circle"></i> ${report.warning_issues} Warnings</span>
+                <span class="issue-badge good"><i class="fas fa-check-circle"></i> ${12 - report.total_issues} Optimal</span>
+            `;
+
+            // Nutrient bar chart
+            const ctxBar = document.getElementById('nutrientChart').getContext('2d');
+            if (nutrientChartInstance) nutrientChartInstance.destroy();
+
+            const labels = report.nutrient_analysis.map(n => n.name.split(' ')[0]);
+            const values = report.nutrient_analysis.map(n => n.percentage);
+            const barColorsArr = report.nutrient_analysis.map(n => {
+                if (n.severity === 'critical') return '#ef4444';
+                if (n.severity === 'warning') return '#f59e0b';
+                return '#22c55e';
+            });
+
+            nutrientChartInstance = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '% of Max Reference',
+                        data: values,
+                        backgroundColor: barColorsArr,
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const n = report.nutrient_analysis[context.dataIndex];
+                                    return `Value: ${n.value} ${n.unit}\nStatus: ${n.status}\nOptimal: ${n.optimal_range}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: '% of Max Reference Value' }
+                        },
+                        x: {
+                            ticks: { maxRotation: 45, minRotation: 45 }
+                        }
+                    }
+                }
+            });
+
+            // Radar chart
+            const ctxRadar = document.getElementById('radarChart').getContext('2d');
+            if (radarChartInstance) radarChartInstance.destroy();
+
+            const radarValues = report.nutrient_analysis.map(n => {
+                if (n.status === 'Optimal') return 100;
+                if (n.status === 'Low' || n.status === 'High') return 60;
+                return 20;
+            });
+
+            radarChartInstance = new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Nutrient Status',
+                        data: radarValues,
+                        backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                        borderColor: '#22c55e',
+                        borderWidth: 2,
+                        pointBackgroundColor: barColorsArr,
+                        pointBorderColor: '#fff',
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const n = report.nutrient_analysis[context.dataIndex];
+                                    return `${n.name}: ${n.value} ${n.unit} (${n.status})`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { stepSize: 25, display: false },
+                            pointLabels: { font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            // Recommendations
+            const recList = document.getElementById('recommendationsList');
+            recList.innerHTML = '<h3><i class="fas fa-lightbulb"></i> Recommendations to Improve Soil</h3>';
+
+            const issues = report.issues.sort((a, b) => {
+                if (a.severity === 'critical' && b.severity !== 'critical') return -1;
+                if (a.severity !== 'critical' && b.severity === 'critical') return 1;
+                return 0;
+            });
+
+            if (issues.length === 0) {
+                recList.innerHTML += '<div class="rec-card" style="border-left-color:#22c55e; background:#f0fdf4;"><p>All nutrient levels are within optimal range. Maintain your current soil management practices.</p></div>';
+            } else {
+                issues.forEach(issue => {
+                    recList.innerHTML += `
+                        <div class="rec-card ${issue.severity}">
+                            <div class="rec-card-header">
+                                <strong>${issue.nutrient}</strong>
+                                <span class="rec-card-status ${issue.severity}">${issue.status}</span>
+                            </div>
+                            <p>${issue.recommendation}</p>
+                        </div>
+                    `;
+                });
+            }
+        }
     </script>
 </body>
 </html>

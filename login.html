@@ -838,6 +838,7 @@
                     firstName,
                     lastName,
                     email,
+                    password,
                     occupation,
                     country,
                     phone
@@ -872,38 +873,47 @@
             }
         }
 
-        function simulateLogin() {
+        async function simulateLogin() {
             const loginLoading = document.getElementById('loginLoading');
             const loginSuccess = document.getElementById('loginSuccess');
             const submitBtn = loginForm.querySelector('.form-submit');
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
 
             loginLoading.classList.add('show');
             submitBtn.disabled = true;
 
-            setTimeout(() => {
+            try {
+                const res = await fetch('http://localhost:5000/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+
                 loginLoading.classList.remove('show');
-                loginSuccess.classList.add('show');
 
-                setTimeout(() => {
-                    const existingProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-                    const loginEmail = document.getElementById('loginEmail').value;
-
-                    localStorage.setItem('userProfile', JSON.stringify({
-                        firstName: existingProfile.firstName || 'User',
-                        lastName: existingProfile.lastName || '',
-                        email: loginEmail,
-                        occupation: existingProfile.occupation || 'Farmer'
-                    }));
-
-                    loginForm.reset();
-                    loginSuccess.classList.remove('show');
+                if (data.success) {
+                    loginSuccess.classList.add('show');
+                    localStorage.setItem('userProfile', JSON.stringify(data.user));
+                    setTimeout(() => {
+                        loginForm.reset();
+                        loginSuccess.classList.remove('show');
+                        submitBtn.disabled = false;
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                } else {
                     submitBtn.disabled = false;
-                    window.location.href = 'dashboard.html';
-                }, 1500);
-            }, 2000);
+                    showError('loginPasswordError', data.error || 'Login failed');
+                }
+            } catch (err) {
+                loginLoading.classList.remove('show');
+                submitBtn.disabled = false;
+                showError('loginPasswordError', 'Cannot connect to server. Make sure Flask is running.');
+            }
         }
 
-        function simulateRegister(profileData) {
+        async function simulateRegister(profileData) {
             const registerLoading = document.getElementById('registerLoading');
             const registerSuccess = document.getElementById('registerSuccess');
             const submitBtn = registerForm.querySelector('.form-submit');
@@ -911,19 +921,34 @@
             registerLoading.classList.add('show');
             submitBtn.disabled = true;
 
-            setTimeout(() => {
+            try {
+                const res = await fetch('http://localhost:5000/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(profileData)
+                });
+                const data = await res.json();
+
                 registerLoading.classList.remove('show');
-                registerSuccess.classList.add('show');
 
-                setTimeout(() => {
-                    localStorage.setItem('userProfile', JSON.stringify(profileData));
-
-                    registerForm.reset();
-                    registerSuccess.classList.remove('show');
+                if (data.success) {
+                    registerSuccess.classList.add('show');
+                    localStorage.setItem('userProfile', JSON.stringify(data.user));
+                    setTimeout(() => {
+                        registerForm.reset();
+                        registerSuccess.classList.remove('show');
+                        submitBtn.disabled = false;
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                } else {
                     submitBtn.disabled = false;
-                    window.location.href = 'dashboard.html';
-                }, 1500);
-            }, 2000);
+                    showError('registerEmailError', data.error || 'Registration failed');
+                }
+            } catch (err) {
+                registerLoading.classList.remove('show');
+                submitBtn.disabled = false;
+                showError('registerEmailError', 'Cannot connect to server. Make sure Flask is running.');
+            }
         }
 
         // Smooth scroll to form on hash change
