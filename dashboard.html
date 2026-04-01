@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main Dashboard - Soil Fertility Prediction</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
     <style>
         :root {
             --green-50: #f0fdf4;
@@ -27,7 +29,9 @@
             --purple-500: #8b5cf6;
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         .dash-wrapper {
             min-height: 100vh;
@@ -83,7 +87,9 @@
             transition: box-shadow 0.2s;
         }
 
-        .profile-chip:hover { box-shadow: var(--shadow-lg); }
+        .profile-chip:hover {
+            box-shadow: var(--shadow-lg);
+        }
 
         .profile-icon {
             width: 38px;
@@ -97,8 +103,16 @@
             font-size: 0.95rem;
         }
 
-        .profile-name { font-weight: 700; color: var(--text-dark); font-size: 0.9rem; }
-        .profile-role { color: var(--text-light); font-size: 0.8rem; }
+        .profile-name {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        .profile-role {
+            color: var(--text-light);
+            font-size: 0.8rem;
+        }
 
         /* Main content */
         .dash-content {
@@ -145,7 +159,7 @@
             background: #fff;
             border-radius: 16px;
             padding: 1.25rem;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -155,7 +169,7 @@
 
         .usage-stat-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
         }
 
         .ring-chart {
@@ -276,8 +290,15 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Quick actions */
@@ -292,7 +313,7 @@
             background: #fff;
             border-radius: 14px;
             padding: 1.25rem;
-            box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
             border: 2px solid transparent;
             cursor: pointer;
             transition: all 0.25s;
@@ -304,13 +325,24 @@
 
         .action-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
-        .action-card.green:hover { border-color: var(--green-500); }
-        .action-card.blue:hover { border-color: var(--blue-500); }
-        .action-card.purple:hover { border-color: var(--purple-500); }
-        .action-card.amber:hover { border-color: var(--amber-500); }
+        .action-card.green:hover {
+            border-color: var(--green-500);
+        }
+
+        .action-card.blue:hover {
+            border-color: var(--blue-500);
+        }
+
+        .action-card.purple:hover {
+            border-color: var(--purple-500);
+        }
+
+        .action-card.amber:hover {
+            border-color: var(--amber-500);
+        }
 
         .action-icon {
             width: 48px;
@@ -323,20 +355,44 @@
             margin: 0 auto 0.6rem;
         }
 
-        .action-card.green .action-icon { background: var(--green-50); color: var(--green-600); }
-        .action-card.blue .action-icon { background: var(--blue-50); color: var(--blue-500); }
-        .action-card.purple .action-icon { background: var(--purple-50); color: var(--purple-500); }
-        .action-card.amber .action-icon { background: var(--amber-50); color: var(--amber-500); }
+        .action-card.green .action-icon {
+            background: var(--green-50);
+            color: var(--green-600);
+        }
 
-        .action-title { font-weight: 700; font-size: 0.95rem; color: var(--text-dark); margin-bottom: 0.2rem; }
-        .action-desc { font-size: 0.8rem; color: var(--text-light); }
+        .action-card.blue .action-icon {
+            background: var(--blue-50);
+            color: var(--blue-500);
+        }
+
+        .action-card.purple .action-icon {
+            background: var(--purple-50);
+            color: var(--purple-500);
+        }
+
+        .action-card.amber .action-icon {
+            background: var(--amber-50);
+            color: var(--amber-500);
+        }
+
+        .action-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            margin-bottom: 0.2rem;
+        }
+
+        .action-desc {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
 
         /* Card base */
         .dash-card {
             background: #fff;
             border-radius: 14px;
             padding: 1.5rem;
-            box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
             border: 1px solid #f1f5f9;
             margin-bottom: 1.5rem;
             animation: slideUp 0.6s ease-out backwards;
@@ -358,7 +414,9 @@
             gap: 0.5rem;
         }
 
-        .dash-card-head h3 i { color: var(--green-600); }
+        .dash-card-head h3 i {
+            color: var(--green-600);
+        }
 
         /* Fertilizer Questionnaire */
         .fert-step-indicator {
@@ -390,7 +448,9 @@
             animation: fadeIn 0.3s ease;
         }
 
-        .fert-step.active { display: block; }
+        .fert-step.active {
+            display: block;
+        }
 
         .fert-step-icon {
             width: 56px;
@@ -451,12 +511,22 @@
         .fert-opt-btn.selected {
             border-color: var(--green-500);
             background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
-            box-shadow: 0 4px 12px rgba(34,197,94,0.15);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
         }
 
-        .fert-opt-btn i { font-size: 1.3rem; }
-        .fert-opt-btn strong { font-size: 0.9rem; color: var(--text-dark); }
-        .fert-opt-btn span { font-size: 0.75rem; color: var(--text-light); }
+        .fert-opt-btn i {
+            font-size: 1.3rem;
+        }
+
+        .fert-opt-btn strong {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .fert-opt-btn span {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
 
         .fert-select-wrapper {
             max-width: 400px;
@@ -481,7 +551,7 @@
 
         .fert-question-select:focus {
             border-color: var(--green-500);
-            box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
             outline: none;
         }
 
@@ -522,7 +592,7 @@
             border-radius: 50%;
             background: var(--green-500);
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(34,197,94,0.4);
+            box-shadow: 0 2px 6px rgba(34, 197, 94, 0.4);
         }
 
         .fert-nav {
@@ -532,7 +602,10 @@
             gap: 1rem;
         }
 
-        .fert-nav-btn { min-width: 120px; justify-content: center; }
+        .fert-nav-btn {
+            min-width: 120px;
+            justify-content: center;
+        }
 
         /* Results */
         .fert-results {
@@ -540,7 +613,9 @@
             display: none;
         }
 
-        .fert-results.show { display: block; }
+        .fert-results.show {
+            display: block;
+        }
 
         .result-header {
             display: flex;
@@ -580,10 +655,13 @@
 
         .fert-result-card:hover {
             transform: translateX(4px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
         }
 
-        .fert-result-card.top { border-left-color: var(--green-600); background: var(--green-50); }
+        .fert-result-card.top {
+            border-left-color: var(--green-600);
+            background: var(--green-50);
+        }
 
         .fert-result-head {
             display: flex;
@@ -652,7 +730,11 @@
         }
 
         /* Activity */
-        .activity-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
 
         .activity-item {
             display: flex;
@@ -670,12 +752,29 @@
             flex-shrink: 0;
         }
 
-        .activity-dot.green { background: var(--green-500); }
-        .activity-dot.blue { background: var(--blue-500); }
-        .activity-dot.amber { background: var(--amber-500); }
+        .activity-dot.green {
+            background: var(--green-500);
+        }
 
-        .activity-text { flex: 1; font-size: 0.85rem; color: var(--text-dark); }
-        .activity-time { font-size: 0.75rem; color: var(--text-light); white-space: nowrap; }
+        .activity-dot.blue {
+            background: var(--blue-500);
+        }
+
+        .activity-dot.amber {
+            background: var(--amber-500);
+        }
+
+        .activity-text {
+            flex: 1;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            white-space: nowrap;
+        }
 
         /* Two column grid */
         .dash-grid {
@@ -699,49 +798,257 @@
             border: none;
             font-size: 1.3rem;
             cursor: pointer;
-            box-shadow: 0 4px 16px rgba(245,158,11,0.4);
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
             z-index: 1500;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        .feedback-fab:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(245,158,11,0.5); }
-        .feedback-modal { position: fixed; inset: 0; background: rgba(15,23,42,0.5); display: none; align-items: center; justify-content: center; padding: 1rem; z-index: 2000; backdrop-filter: blur(4px); }
-        .feedback-modal.show { display: flex; }
-        .feedback-card { width: min(480px,100%); background: #fff; border-radius: 16px; box-shadow: var(--shadow-lg); overflow: hidden; animation: fadeScale 0.3s ease-out; }
-        .feedback-header { background: linear-gradient(135deg,#f59e0b,#d97706); color: #fff; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; }
-        .feedback-header-info { display: flex; align-items: center; gap: 0.75rem; }
-        .feedback-header-icon { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
-        .feedback-header h4 { font-size: 0.95rem; margin: 0; }
-        .feedback-header span { font-size: 0.75rem; opacity: 0.85; }
-        .feedback-body { padding: 1.25rem; }
-        .feedback-progress { height: 4px; background: #e5e7eb; border-radius: 2px; margin-bottom: 0.5rem; overflow: hidden; }
-        .feedback-progress-fill { height: 100%; background: linear-gradient(90deg,#f59e0b,#d97706); border-radius: 2px; transition: width 0.4s ease; }
-        .feedback-step-label { font-size: 0.75rem; color: var(--text-light); margin-bottom: 1.25rem; text-align: center; }
-        .feedback-q { display: none; animation: fadeIn 0.3s ease; }
-        .feedback-q.active { display: block; }
-        .feedback-q h5 { font-size: 1rem; color: var(--text-dark); margin-bottom: 1rem; }
-        .star-rating { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 0.75rem; }
-        .star-btn { background: none; border: none; font-size: 2rem; color: #e5e7eb; cursor: pointer; transition: color 0.2s, transform 0.15s; }
-        .star-btn:hover { transform: scale(1.15); }
-        .star-btn.active { color: #f59e0b; }
-        .star-label { display: block; text-align: center; font-size: 0.85rem; color: var(--text-light); }
-        .feedback-checks { display: flex; flex-direction: column; gap: 0.6rem; }
-        .feedback-check { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.75rem; background: #f8fafc; border-radius: 8px; cursor: pointer; font-size: 0.9rem; color: var(--text-dark); transition: background 0.2s; }
-        .feedback-check:hover { background: #f0fdf4; }
-        .feedback-check input { accent-color: #f59e0b; width: 16px; height: 16px; }
-        .feedback-options { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-        .feedback-opt-btn { padding: 0.55rem 1rem; border: 2px solid #e5e7eb; border-radius: 20px; background: #fff; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); cursor: pointer; transition: all 0.2s; font-family: inherit; }
-        .feedback-opt-btn:hover { border-color: #f59e0b; background: #fffbeb; }
-        .feedback-opt-btn.selected { border-color: #f59e0b; background: #fef3c7; color: #92400e; }
-        .feedback-textarea { width: 100%; border: 2px solid #e5e7eb; border-radius: 10px; padding: 0.75rem; font-size: 0.9rem; font-family: inherit; resize: vertical; outline: none; transition: border-color 0.2s; }
-        .feedback-textarea:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.12); }
-        .feedback-nav { display: flex; justify-content: space-between; padding: 1rem 1.25rem; border-top: 1px solid #e5e7eb; }
-        .feedback-thanks { text-align: center; padding: 2rem 0; }
-        .feedback-thanks-icon { font-size: 3rem; color: #22c55e; margin-bottom: 0.75rem; }
-        .feedback-thanks h4 { font-size: 1.2rem; color: var(--text-dark); margin-bottom: 0.3rem; }
-        .feedback-thanks p { font-size: 0.9rem; color: var(--text-light); }
+
+        .feedback-fab:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 24px rgba(245, 158, 11, 0.5);
+        }
+
+        .feedback-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+
+        .feedback-modal.show {
+            display: flex;
+        }
+
+        .feedback-card {
+            width: min(480px, 100%);
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            animation: fadeScale 0.3s ease-out;
+        }
+
+        .feedback-header {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .feedback-header-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .feedback-header-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .feedback-header h4 {
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .feedback-header span {
+            font-size: 0.75rem;
+            opacity: 0.85;
+        }
+
+        .feedback-body {
+            padding: 1.25rem;
+        }
+
+        .feedback-progress {
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .feedback-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            border-radius: 2px;
+            transition: width 0.4s ease;
+        }
+
+        .feedback-step-label {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-bottom: 1.25rem;
+            text-align: center;
+        }
+
+        .feedback-q {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-q.active {
+            display: block;
+        }
+
+        .feedback-q h5 {
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .star-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #e5e7eb;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.15s;
+        }
+
+        .star-btn:hover {
+            transform: scale(1.15);
+        }
+
+        .star-btn.active {
+            color: #f59e0b;
+        }
+
+        .star-label {
+            display: block;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .feedback-checks {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .feedback-check {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 0.75rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            transition: background 0.2s;
+        }
+
+        .feedback-check:hover {
+            background: #f0fdf4;
+        }
+
+        .feedback-check input {
+            accent-color: #f59e0b;
+            width: 16px;
+            height: 16px;
+        }
+
+        .feedback-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .feedback-opt-btn {
+            padding: 0.55rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 20px;
+            background: #fff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .feedback-opt-btn:hover {
+            border-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .feedback-opt-btn.selected {
+            border-color: #f59e0b;
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .feedback-textarea {
+            width: 100%;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .feedback-textarea:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12);
+        }
+
+        .feedback-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .feedback-thanks {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .feedback-thanks-icon {
+            font-size: 3rem;
+            color: #22c55e;
+            margin-bottom: 0.75rem;
+        }
+
+        .feedback-thanks h4 {
+            font-size: 1.2rem;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .feedback-thanks p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
         /* Chatbot */
         .chat-fab {
             position: fixed;
@@ -755,7 +1062,7 @@
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            box-shadow: 0 4px 16px rgba(34,197,94,0.4);
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4);
             z-index: 1500;
             display: flex;
             align-items: center;
@@ -763,7 +1070,10 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .chat-fab:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(34,197,94,0.5); }
+        .chat-fab:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 24px rgba(34, 197, 94, 0.5);
+        }
 
         .chat-window {
             position: fixed;
@@ -773,14 +1083,16 @@
             max-height: 520px;
             background: #fff;
             border-radius: 16px;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
             z-index: 1500;
             display: none;
             flex-direction: column;
             overflow: hidden;
         }
 
-        .chat-window.open { display: flex; }
+        .chat-window.open {
+            display: flex;
+        }
 
         .chat-header {
             background: linear-gradient(135deg, #22c55e, #16a34a);
@@ -795,15 +1107,22 @@
             width: 38px;
             height: 38px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1rem;
         }
 
-        .chat-header-info h4 { font-size: 0.95rem; margin: 0; }
-        .chat-header-info span { font-size: 0.75rem; opacity: 0.85; }
+        .chat-header-info h4 {
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .chat-header-info span {
+            font-size: 0.75rem;
+            opacity: 0.85;
+        }
 
         .chat-messages {
             flex: 1;
@@ -825,18 +1144,71 @@
             word-wrap: break-word;
         }
 
-        .chat-msg.bot { background: #fff; border: 1px solid #e5e7eb; color: #1f2937; align-self: flex-start; border-bottom-left-radius: 4px; }
-        .chat-msg.user { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .chat-msg.bot strong { color: #166534; }
-        .chat-msg.typing { align-self: flex-start; background: #fff; border: 1px solid #e5e7eb; padding: 0.6rem 1rem; border-bottom-left-radius: 4px; }
+        .chat-msg.bot {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            color: #1f2937;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
 
-        .typing-dots span { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #9ca3af; margin: 0 2px; animation: typingBounce 1.2s infinite; }
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        .chat-msg.user {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
 
-        @keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+        .chat-msg.bot strong {
+            color: #166534;
+        }
 
-        .chat-input-area { display: flex; padding: 0.75rem; border-top: 1px solid #e5e7eb; background: #fff; gap: 0.5rem; }
+        .chat-msg.typing {
+            align-self: flex-start;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            padding: 0.6rem 1rem;
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing-dots span {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #9ca3af;
+            margin: 0 2px;
+            animation: typingBounce 1.2s infinite;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingBounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+            }
+
+            30% {
+                transform: translateY(-6px);
+            }
+        }
+
+        .chat-input-area {
+            display: flex;
+            padding: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+            background: #fff;
+            gap: 0.5rem;
+        }
 
         .chat-input-area input {
             flex: 1;
@@ -849,18 +1221,34 @@
             transition: border-color 0.2s;
         }
 
-        .chat-input-area input:focus { border-color: #22c55e; }
-
-        .chat-send-btn {
-            width: 40px; height: 40px; border-radius: 50%; border: none;
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: #fff; font-size: 0.95rem; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; transition: transform 0.15s;
+        .chat-input-area input:focus {
+            border-color: #22c55e;
         }
 
-        .chat-send-btn:hover { transform: scale(1.05); }
-        .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .chat-send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: transform 0.15s;
+        }
+
+        .chat-send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .chat-send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
         /* Profile modal */
         .profile-modal {
@@ -875,7 +1263,9 @@
             backdrop-filter: blur(4px);
         }
 
-        .profile-modal.show { display: flex; }
+        .profile-modal.show {
+            display: flex;
+        }
 
         .profile-modal-card {
             width: min(520px, 100%);
@@ -887,8 +1277,15 @@
         }
 
         @keyframes fadeScale {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         .profile-modal-head {
@@ -898,7 +1295,10 @@
             margin-bottom: 0.75rem;
         }
 
-        .profile-modal-head h3 { color: var(--text-dark); font-size: 1.1rem; }
+        .profile-modal-head h3 {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+        }
 
         .modal-close {
             border: none;
@@ -909,9 +1309,14 @@
             transition: color 0.2s;
         }
 
-        .modal-close:hover { color: var(--text-dark); }
+        .modal-close:hover {
+            color: var(--text-dark);
+        }
 
-        .profile-details { display: grid; gap: 0.5rem; }
+        .profile-details {
+            display: grid;
+            gap: 0.5rem;
+        }
 
         .profile-row {
             background: #f8fafc;
@@ -920,14 +1325,39 @@
             padding: 0.55rem 0.7rem;
         }
 
-        .profile-row strong { color: var(--text-dark); }
+        .profile-row strong {
+            color: var(--text-dark);
+        }
+
+        .profile-logout {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+            border: none;
+            padding: 0.65rem 2rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
 
         /* Spinner */
         .spinner {
             display: inline-block;
             width: 18px;
             height: 18px;
-            border: 3px solid rgba(255,255,255,0.3);
+            border: 3px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: #fff;
             animation: spin 0.8s linear infinite;
@@ -935,30 +1365,86 @@
             margin-right: 6px;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
         /* Responsive */
         @media (max-width: 992px) {
-            .actions-row { grid-template-columns: 1fr 1fr; }
-            .usage-stats-row { grid-template-columns: 1fr 1fr; }
-            .charts-row { grid-template-columns: 1fr; }
-            .chart-card-small { order: -1; }
-            .soil-cond-grid { grid-template-columns: 1fr; }
-            .soil-cond-charts { grid-template-columns: 1fr 1fr; }
-            .dash-grid { grid-template-columns: 1fr; }
-            .fert-options { grid-template-columns: 1fr 1fr; }
-            .fert-sliders { max-width: 100%; }
+            .actions-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .usage-stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-card-small {
+                order: -1;
+            }
+
+            .soil-cond-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .soil-cond-charts {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .dash-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .fert-options {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .fert-sliders {
+                max-width: 100%;
+            }
         }
 
         @media (max-width: 640px) {
-            .dash-topbar { padding: 1rem; }
-            .dash-content { padding: 0 1rem 2rem; }
-            .greeting-section h1 { font-size: 1.5rem; }
-            .actions-row { grid-template-columns: 1fr; }
-            .usage-stats-row { grid-template-columns: 1fr 1fr; }
-            .soil-cond-charts { grid-template-columns: 1fr; }
-            .fert-options, .fert-options-multi { grid-template-columns: 1fr; }
-            .chat-window { width: calc(100vw - 2rem); right: -0.5rem; bottom: 5rem; }
+            .dash-topbar {
+                padding: 1rem;
+            }
+
+            .dash-content {
+                padding: 0 1rem 2rem;
+            }
+
+            .greeting-section h1 {
+                font-size: 1.5rem;
+            }
+
+            .actions-row {
+                grid-template-columns: 1fr;
+            }
+
+            .usage-stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .soil-cond-charts {
+                grid-template-columns: 1fr;
+            }
+
+            .fert-options,
+            .fert-options-multi {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-window {
+                width: calc(100vw - 2rem);
+                right: -0.5rem;
+                bottom: 5rem;
+            }
         }
 
         /* Recent Soil Conditions */
@@ -967,7 +1453,9 @@
             animation: slideUp 0.7s ease-out;
         }
 
-        .soil-cond-card { margin-bottom: 0; }
+        .soil-cond-card {
+            margin-bottom: 0;
+        }
 
         .soil-empty-state {
             text-align: center;
@@ -1025,7 +1513,9 @@
             text-align: center;
         }
 
-        .soil-chart-wrap canvas { max-height: 220px; }
+        .soil-chart-wrap canvas {
+            max-height: 220px;
+        }
 
         .soil-cond-history h5 {
             font-size: 0.85rem;
@@ -1046,8 +1536,15 @@
             transition: all 0.2s;
         }
 
-        .soil-history-item:hover { background: #f0fdf4; border-color: var(--green-300); }
-        .soil-history-item.active { background: #f0fdf4; border-color: var(--green-500); }
+        .soil-history-item:hover {
+            background: #f0fdf4;
+            border-color: var(--green-300);
+        }
+
+        .soil-history-item.active {
+            background: #f0fdf4;
+            border-color: var(--green-500);
+        }
 
         .soil-history-badge {
             width: 36px;
@@ -1061,11 +1558,25 @@
             flex-shrink: 0;
         }
 
-        .soil-history-badge.good { background: #dcfce7; color: #16a34a; }
-        .soil-history-badge.moderate { background: #fef3c7; color: #d97706; }
-        .soil-history-badge.poor { background: #fecaca; color: #dc2626; }
+        .soil-history-badge.good {
+            background: #dcfce7;
+            color: #16a34a;
+        }
 
-        .soil-history-info { flex: 1; min-width: 0; }
+        .soil-history-badge.moderate {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .soil-history-badge.poor {
+            background: #fecaca;
+            color: #dc2626;
+        }
+
+        .soil-history-info {
+            flex: 1;
+            min-width: 0;
+        }
 
         .soil-history-label {
             font-size: 0.85rem;
@@ -1090,6 +1601,7 @@
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1rem;
         }
+
         .feedback-review-card {
             background: #f8fafc;
             border: 1px solid #e5e7eb;
@@ -1097,13 +1609,53 @@
             padding: 1rem;
             transition: transform 0.2s;
         }
-        .feedback-review-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-        .feedback-review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-        .feedback-review-stars { color: #f59e0b; font-size: 0.85rem; }
-        .feedback-review-email { font-size: 0.75rem; color: var(--text-light); }
-        .feedback-review-text { font-size: 0.85rem; color: var(--text-dark); line-height: 1.5; margin-top: 0.4rem; }
-        .feedback-review-meta { font-size: 0.72rem; color: var(--text-light); margin-top: 0.5rem; }
-        .feedback-review-tag { display: inline-block; font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 8px; background: #fffbeb; color: #92400e; margin-right: 0.3rem; margin-top: 0.3rem; }
+
+        .feedback-review-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .feedback-review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback-review-stars {
+            color: #f59e0b;
+            font-size: 0.85rem;
+        }
+
+        .feedback-review-email {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .feedback-review-text {
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            line-height: 1.5;
+            margin-top: 0.4rem;
+        }
+
+        .feedback-review-meta {
+            font-size: 0.72rem;
+            color: var(--text-light);
+            margin-top: 0.5rem;
+        }
+
+        .feedback-review-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 8px;
+            background: #fffbeb;
+            color: #92400e;
+            margin-right: 0.3rem;
+            margin-top: 0.3rem;
+        }
+
         /* Soil Guide Modal */
         .guide-modal {
             position: fixed;
@@ -1117,7 +1669,9 @@
             backdrop-filter: blur(4px);
         }
 
-        .guide-modal.show { display: flex; }
+        .guide-modal.show {
+            display: flex;
+        }
 
         .guide-modal-card {
             width: min(900px, 100%);
@@ -1177,11 +1731,24 @@
             white-space: nowrap;
         }
 
-        .guide-tab:hover { background: #f0fdf4; color: var(--green-600); }
-        .guide-tab.active { background: var(--green-100); color: var(--green-700); }
+        .guide-tab:hover {
+            background: #f0fdf4;
+            color: var(--green-600);
+        }
 
-        .guide-section { display: none; }
-        .guide-section.active { display: block; animation: fadeIn 0.3s ease; }
+        .guide-tab.active {
+            background: var(--green-100);
+            color: var(--green-700);
+        }
+
+        .guide-section {
+            display: none;
+        }
+
+        .guide-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
 
         .guide-section h4 {
             font-size: 1.15rem;
@@ -1192,7 +1759,9 @@
             gap: 0.5rem;
         }
 
-        .guide-section h4 i { color: var(--green-600); }
+        .guide-section h4 i {
+            color: var(--green-600);
+        }
 
         .guide-section p {
             color: var(--text-light);
@@ -1217,7 +1786,7 @@
 
         .guide-info-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         .guide-info-card h5 {
@@ -1229,7 +1798,9 @@
             gap: 0.4rem;
         }
 
-        .guide-info-card h5 i { font-size: 0.85rem; }
+        .guide-info-card h5 i {
+            font-size: 0.85rem;
+        }
 
         .guide-info-card p {
             font-size: 0.85rem;
@@ -1260,7 +1831,9 @@
             color: var(--text-dark);
         }
 
-        .guide-table tr:hover td { background: #f8fafc; }
+        .guide-table tr:hover td {
+            background: #f8fafc;
+        }
 
         .guide-tip {
             background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
@@ -1272,7 +1845,9 @@
             color: var(--text-dark);
         }
 
-        .guide-tip strong { color: var(--green-700); }
+        .guide-tip strong {
+            color: var(--green-700);
+        }
 
         .guide-warning {
             background: linear-gradient(135deg, #fffbeb, #fef3c7);
@@ -1284,7 +1859,9 @@
             color: var(--text-dark);
         }
 
-        .guide-warning strong { color: #b45309; }
+        .guide-warning strong {
+            color: #b45309;
+        }
 
         .nutrient-bar-container {
             display: flex;
@@ -1342,6 +1919,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="dash-wrapper">
         <!-- Topbar -->
@@ -1372,8 +1950,11 @@
                 <div class="usage-stat-card">
                     <div class="ring-chart" data-value="0" data-color="#22c55e">
                         <svg viewBox="0 0 36 36">
-                            <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                            <path class="ring-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#22c55e" stroke-dasharray="0, 100"/>
+                            <path class="ring-bg"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="ring-fill"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                stroke="#22c55e" stroke-dasharray="0, 100" />
                         </svg>
                         <span class="ring-value" id="statSoilAnalysis">0</span>
                     </div>
@@ -1385,8 +1966,11 @@
                 <div class="usage-stat-card">
                     <div class="ring-chart" data-value="0" data-color="#3b82f6">
                         <svg viewBox="0 0 36 36">
-                            <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                            <path class="ring-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#3b82f6" stroke-dasharray="0, 100"/>
+                            <path class="ring-bg"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="ring-fill"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                stroke="#3b82f6" stroke-dasharray="0, 100" />
                         </svg>
                         <span class="ring-value" id="statSoilReports">0</span>
                     </div>
@@ -1398,8 +1982,11 @@
                 <div class="usage-stat-card">
                     <div class="ring-chart" data-value="0" data-color="#f59e0b">
                         <svg viewBox="0 0 36 36">
-                            <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                            <path class="ring-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#f59e0b" stroke-dasharray="0, 100"/>
+                            <path class="ring-bg"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="ring-fill"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                stroke="#f59e0b" stroke-dasharray="0, 100" />
                         </svg>
                         <span class="ring-value" id="statFertilizerPred">0</span>
                     </div>
@@ -1411,8 +1998,11 @@
                 <div class="usage-stat-card">
                     <div class="ring-chart" data-value="0" data-color="#8b5cf6">
                         <svg viewBox="0 0 36 36">
-                            <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                            <path class="ring-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#8b5cf6" stroke-dasharray="0, 100"/>
+                            <path class="ring-bg"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="ring-fill"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                stroke="#8b5cf6" stroke-dasharray="0, 100" />
                         </svg>
                         <span class="ring-value" id="statChatbot">0</span>
                     </div>
@@ -1477,14 +2067,16 @@
                 <div class="dash-card soil-cond-card">
                     <div class="dash-card-head">
                         <h3><i class="fas fa-microscope"></i> Recent Soil Conditions</h3>
-                        <a href="analysis.html" class="btn btn-secondary btn-small"><i class="fas fa-plus"></i> New Analysis</a>
+                        <a href="analysis.html" class="btn btn-secondary btn-small"><i class="fas fa-plus"></i> New
+                            Analysis</a>
                     </div>
                     <div id="soilCondContent">
                         <div class="soil-empty-state" id="soilEmptyState">
                             <div class="soil-empty-icon"><i class="fas fa-seedling"></i></div>
                             <h4>No soil analyses yet</h4>
                             <p>Run your first soil analysis to see nutrient levels and conditions here.</p>
-                            <a href="analysis.html" class="btn btn-primary btn-small"><i class="fas fa-flask"></i> Analyze Soil</a>
+                            <a href="analysis.html" class="btn btn-primary btn-small"><i class="fas fa-flask"></i>
+                                Analyze Soil</a>
                         </div>
                         <div class="soil-cond-grid" id="soilCondGrid" style="display:none">
                             <div class="soil-cond-charts">
@@ -1512,7 +2104,8 @@
                 <div class="dash-card soil-cond-card">
                     <div class="dash-card-head">
                         <h3><i class="fas fa-comments"></i> Feedback Reviews</h3>
-                        <button class="btn btn-secondary btn-small" id="openFeedbackModal"><i class="fas fa-plus"></i> Give Feedback</button>
+                        <button class="btn btn-secondary btn-small" id="openFeedbackModal"><i class="fas fa-plus"></i>
+                            Give Feedback</button>
                     </div>
                     <div id="feedbackReviewsContent">
                         <div class="soil-empty-state" id="feedbackEmptyState">
@@ -1703,7 +2296,8 @@
                     <div class="fert-results" id="fertResults">
                         <div class="result-header">
                             <h4><i class="fas fa-check-circle" style="color:var(--green-500)"></i> Recommendation</h4>
-                            <button class="btn btn-secondary btn-small" id="restartQuiz"><i class="fas fa-redo"></i> Start Over</button>
+                            <button class="btn btn-secondary btn-small" id="restartQuiz"><i class="fas fa-redo"></i>
+                                Start Over</button>
                         </div>
                         <div id="fertResultsList"></div>
                     </div>
@@ -1739,6 +2333,9 @@
                 <div class="profile-row"><strong>Country:</strong> <span id="detailCountry"></span></div>
                 <div class="profile-row"><strong>Phone:</strong> <span id="detailPhone"></span></div>
             </div>
+            <div class="profile-logout">
+                <button class="btn btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</button>
+            </div>
         </div>
     </div>
 
@@ -1747,7 +2344,8 @@
         <div class="guide-modal-card">
             <div class="guide-modal-head">
                 <h3><i class="fas fa-book-open"></i> Complete Soil Management Guide</h3>
-                <button class="modal-close" id="guideModalClose" style="color:#fff;opacity:0.8;"><i class="fas fa-times"></i></button>
+                <button class="modal-close" id="guideModalClose" style="color:#fff;opacity:0.8;"><i
+                        class="fas fa-times"></i></button>
             </div>
             <div class="guide-modal-body">
                 <div class="guide-tabs">
@@ -1764,207 +2362,443 @@
                 <!-- Soil Types -->
                 <div class="guide-section active" id="guide-types">
                     <h4><i class="fas fa-mountain"></i> Understanding Soil Types</h4>
-                    <p>Soil type determines water retention, drainage, nutrient availability, and which crops grow best. Identifying your soil type is the first step toward effective management.</p>
+                    <p>Soil type determines water retention, drainage, nutrient availability, and which crops grow best.
+                        Identifying your soil type is the first step toward effective management.</p>
                     <div class="guide-card-grid">
                         <div class="guide-info-card">
                             <h5><i class="fas fa-circle" style="color:#8B4513"></i> Clay Soil</h5>
-                            <p>Heavy, sticky when wet, holds water well. Rich in nutrients but poor drainage. Best for: Paddy, Wheat. Add sand and organic matter to improve structure.</p>
+                            <p>Heavy, sticky when wet, holds water well. Rich in nutrients but poor drainage. Best for:
+                                Paddy, Wheat. Add sand and organic matter to improve structure.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-circle" style="color:#D2B48C"></i> Sandy Soil</h5>
-                            <p>Light, gritty, drains quickly. Low in nutrients and dries out fast. Best for: Groundnut, Watermelon. Add compost and clay to improve water retention.</p>
+                            <p>Light, gritty, drains quickly. Low in nutrients and dries out fast. Best for: Groundnut,
+                                Watermelon. Add compost and clay to improve water retention.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-circle" style="color:#654321"></i> Loamy Soil</h5>
-                            <p>Ideal mix of sand, silt, and clay. Good drainage with moisture retention. Best for: Most crops. The gold standard for farming.</p>
+                            <p>Ideal mix of sand, silt, and clay. Good drainage with moisture retention. Best for: Most
+                                crops. The gold standard for farming.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-circle" style="color:#A0522D"></i> Silt Soil</h5>
-                            <p>Smooth, retains moisture well. Fertile but can compact easily. Best for: Vegetables, Wheat. Avoid working when wet to prevent compaction.</p>
+                            <p>Smooth, retains moisture well. Fertile but can compact easily. Best for: Vegetables,
+                                Wheat. Avoid working when wet to prevent compaction.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-circle" style="color:#556B2F"></i> Peat Soil</h5>
-                            <p>Dark, rich in organic matter, acidic. High water holding capacity. Best for: Vegetables. May need lime to reduce acidity.</p>
+                            <p>Dark, rich in organic matter, acidic. High water holding capacity. Best for: Vegetables.
+                                May need lime to reduce acidity.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-circle" style="color:#C0C0C0"></i> Chalky Soil</h5>
-                            <p>Alkaline, stony, free-draining. Can cause nutrient lockout. Best for: Barley, Cabbage. Add sulfur or organic matter to lower pH.</p>
+                            <p>Alkaline, stony, free-draining. Can cause nutrient lockout. Best for: Barley, Cabbage.
+                                Add sulfur or organic matter to lower pH.</p>
                         </div>
                     </div>
-                    <div class="guide-tip"><strong>Quick Test:</strong> Squeeze moist soil in your hand. If it holds shape but crumbles when poked, it's loamy. If it stays in a tight ball, it's clay. If it falls apart immediately, it's sandy.</div>
+                    <div class="guide-tip"><strong>Quick Test:</strong> Squeeze moist soil in your hand. If it holds
+                        shape but crumbles when poked, it's loamy. If it stays in a tight ball, it's clay. If it falls
+                        apart immediately, it's sandy.</div>
                 </div>
 
                 <!-- Nutrients -->
                 <div class="guide-section" id="guide-nutrients">
                     <h4><i class="fas fa-atom"></i> Macronutrients (NPK)</h4>
-                    <p>Nitrogen (N), Phosphorus (P), and Potassium (K) are the three primary nutrients essential for plant growth. Understanding their roles helps you fertilize effectively.</p>
+                    <p>Nitrogen (N), Phosphorus (P), and Potassium (K) are the three primary nutrients essential for
+                        plant growth. Understanding their roles helps you fertilize effectively.</p>
                     <div class="guide-card-grid">
                         <div class="guide-info-card">
                             <h5><i class="fas fa-leaf" style="color:#22c55e"></i> Nitrogen (N)</h5>
-                            <p><strong>Role:</strong> Leaf growth, chlorophyll production, protein synthesis.<br><strong>Deficiency:</strong> Yellowing of older leaves, stunted growth.<br><strong>Sources:</strong> Urea, Ammonium Sulfate, FYM.<br><strong>Range:</strong> 280-560 kg/ha optimal.</p>
+                            <p><strong>Role:</strong> Leaf growth, chlorophyll production, protein
+                                synthesis.<br><strong>Deficiency:</strong> Yellowing of older leaves, stunted
+                                growth.<br><strong>Sources:</strong> Urea, Ammonium Sulfate,
+                                FYM.<br><strong>Range:</strong> 280-560 kg/ha optimal.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-seedling" style="color:#3b82f6"></i> Phosphorus (P)</h5>
-                            <p><strong>Role:</strong> Root development, energy transfer, flowering.<br><strong>Deficiency:</strong> Purple/dark leaves, poor roots.<br><strong>Sources:</strong> DAP, SSP, Bone Meal.<br><strong>Range:</strong> 10-25 kg/ha optimal.</p>
+                            <p><strong>Role:</strong> Root development, energy transfer,
+                                flowering.<br><strong>Deficiency:</strong> Purple/dark leaves, poor
+                                roots.<br><strong>Sources:</strong> DAP, SSP, Bone Meal.<br><strong>Range:</strong>
+                                10-25 kg/ha optimal.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-shield-alt" style="color:#f59e0b"></i> Potassium (K)</h5>
-                            <p><strong>Role:</strong> Disease resistance, water regulation, fruit quality.<br><strong>Deficiency:</strong> Brown leaf edges, weak stems.<br><strong>Sources:</strong> MOP, SOP, Wood Ash.<br><strong>Range:</strong> 200-500 kg/ha optimal.</p>
+                            <p><strong>Role:</strong> Disease resistance, water regulation, fruit
+                                quality.<br><strong>Deficiency:</strong> Brown leaf edges, weak
+                                stems.<br><strong>Sources:</strong> MOP, SOP, Wood Ash.<br><strong>Range:</strong>
+                                200-500 kg/ha optimal.</p>
                         </div>
                     </div>
                     <h4 style="margin-top:1rem">NPK Application Guidelines</h4>
                     <table class="guide-table">
-                        <thead><tr><th>Crop</th><th>N (kg/ha)</th><th>P (kg/ha)</th><th>K (kg/ha)</th><th>Application</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Crop</th>
+                                <th>N (kg/ha)</th>
+                                <th>P (kg/ha)</th>
+                                <th>K (kg/ha)</th>
+                                <th>Application</th>
+                            </tr>
+                        </thead>
                         <tbody>
-                            <tr><td>Wheat</td><td>120</td><td>60</td><td>40</td><td>N in 2 splits, P&K at sowing</td></tr>
-                            <tr><td>Rice</td><td>100</td><td>40</td><td>40</td><td>N in 3 splits, P&K basal</td></tr>
-                            <tr><td>Maize</td><td>150</td><td>75</td><td>50</td><td>N in 2 splits, P&K at sowing</td></tr>
-                            <tr><td>Cotton</td><td>100</td><td>50</td><td>50</td><td>N in 2 splits, P&K basal</td></tr>
-                            <tr><td>Vegetables</td><td>80-120</td><td>40-60</td><td>40-60</td><td>Balanced NPK with organic matter</td></tr>
+                            <tr>
+                                <td>Wheat</td>
+                                <td>120</td>
+                                <td>60</td>
+                                <td>40</td>
+                                <td>N in 2 splits, P&K at sowing</td>
+                            </tr>
+                            <tr>
+                                <td>Rice</td>
+                                <td>100</td>
+                                <td>40</td>
+                                <td>40</td>
+                                <td>N in 3 splits, P&K basal</td>
+                            </tr>
+                            <tr>
+                                <td>Maize</td>
+                                <td>150</td>
+                                <td>75</td>
+                                <td>50</td>
+                                <td>N in 2 splits, P&K at sowing</td>
+                            </tr>
+                            <tr>
+                                <td>Cotton</td>
+                                <td>100</td>
+                                <td>50</td>
+                                <td>50</td>
+                                <td>N in 2 splits, P&K basal</td>
+                            </tr>
+                            <tr>
+                                <td>Vegetables</td>
+                                <td>80-120</td>
+                                <td>40-60</td>
+                                <td>40-60</td>
+                                <td>Balanced NPK with organic matter</td>
+                            </tr>
                         </tbody>
                     </table>
-                    <div class="guide-warning"><strong>Caution:</strong> Excessive nitrogen causes lush foliage but weak stems, attracts pests, and reduces fruit quality. Always apply based on soil test results.</div>
+                    <div class="guide-warning"><strong>Caution:</strong> Excessive nitrogen causes lush foliage but weak
+                        stems, attracts pests, and reduces fruit quality. Always apply based on soil test results.</div>
                 </div>
 
                 <!-- pH -->
                 <div class="guide-section" id="guide-ph">
                     <h4><i class="fas fa-vial"></i> Soil pH Management</h4>
-                    <p>Soil pH controls nutrient availability. Most crops thrive between pH 6.0-7.5. Even small shifts can lock out critical nutrients.</p>
+                    <p>Soil pH controls nutrient availability. Most crops thrive between pH 6.0-7.5. Even small shifts
+                        can lock out critical nutrients.</p>
                     <div class="guide-card-grid">
                         <div class="guide-info-card">
                             <h5><i class="fas fa-arrow-down" style="color:#ef4444"></i> Acidic Soil (pH &lt; 5.5)</h5>
-                            <p>Aluminum toxicity, reduced P availability. Apply agricultural lime (CaCO3) at 1-2 tonnes/ha. Dolomite lime also adds magnesium. Takes 2-3 months to take effect.</p>
+                            <p>Aluminum toxicity, reduced P availability. Apply agricultural lime (CaCO3) at 1-2
+                                tonnes/ha. Dolomite lime also adds magnesium. Takes 2-3 months to take effect.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-check-circle" style="color:#22c55e"></i> Optimal (pH 6.0 - 7.5)</h5>
-                            <p>All major nutrients available. Most crops grow well. Maintain with regular organic matter additions and balanced fertilization.</p>
+                            <p>All major nutrients available. Most crops grow well. Maintain with regular organic matter
+                                additions and balanced fertilization.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-arrow-up" style="color:#3b82f6"></i> Alkaline Soil (pH &gt; 8.5)</h5>
-                            <p>Iron, zinc, manganese lockout. Apply elemental sulfur or aluminum sulfate. Use acidic mulches (pine needles, coffee grounds). Add gypsum for structure.</p>
+                            <p>Iron, zinc, manganese lockout. Apply elemental sulfur or aluminum sulfate. Use acidic
+                                mulches (pine needles, coffee grounds). Add gypsum for structure.</p>
                         </div>
                     </div>
                     <h4>Nutrient Availability vs pH</h4>
                     <div style="margin-bottom:1rem">
-                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Nitrogen</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:85%;background:linear-gradient(90deg,#22c55e,#16a34a)"></div></div><span class="nutrient-bar-value">Best: 6.0-8.0</span></div>
-                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Phosphorus</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:75%;background:linear-gradient(90deg,#3b82f6,#2563eb)"></div></div><span class="nutrient-bar-value">Best: 6.5-7.5</span></div>
-                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Potassium</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:80%;background:linear-gradient(90deg,#f59e0b,#d97706)"></div></div><span class="nutrient-bar-value">Best: 6.0-7.5</span></div>
-                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Iron</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:70%;background:linear-gradient(90deg,#ef4444,#dc2626)"></div></div><span class="nutrient-bar-value">Best: 4.0-6.5</span></div>
-                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Zinc</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:65%;background:linear-gradient(90deg,#8b5cf6,#7c3aed)"></div></div><span class="nutrient-bar-value">Best: 5.0-7.0</span></div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Nitrogen</span>
+                            <div class="nutrient-bar">
+                                <div class="nutrient-bar-fill"
+                                    style="width:85%;background:linear-gradient(90deg,#22c55e,#16a34a)"></div>
+                            </div><span class="nutrient-bar-value">Best: 6.0-8.0</span>
+                        </div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Phosphorus</span>
+                            <div class="nutrient-bar">
+                                <div class="nutrient-bar-fill"
+                                    style="width:75%;background:linear-gradient(90deg,#3b82f6,#2563eb)"></div>
+                            </div><span class="nutrient-bar-value">Best: 6.5-7.5</span>
+                        </div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Potassium</span>
+                            <div class="nutrient-bar">
+                                <div class="nutrient-bar-fill"
+                                    style="width:80%;background:linear-gradient(90deg,#f59e0b,#d97706)"></div>
+                            </div><span class="nutrient-bar-value">Best: 6.0-7.5</span>
+                        </div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Iron</span>
+                            <div class="nutrient-bar">
+                                <div class="nutrient-bar-fill"
+                                    style="width:70%;background:linear-gradient(90deg,#ef4444,#dc2626)"></div>
+                            </div><span class="nutrient-bar-value">Best: 4.0-6.5</span>
+                        </div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Zinc</span>
+                            <div class="nutrient-bar">
+                                <div class="nutrient-bar-fill"
+                                    style="width:65%;background:linear-gradient(90deg,#8b5cf6,#7c3aed)"></div>
+                            </div><span class="nutrient-bar-value">Best: 5.0-7.0</span>
+                        </div>
                     </div>
-                    <div class="guide-tip"><strong>Tip:</strong> Test pH before planting season. Lime works slowly, apply 2-3 months before sowing. Sulfur acts faster but should be applied in warm, moist soil.</div>
+                    <div class="guide-tip"><strong>Tip:</strong> Test pH before planting season. Lime works slowly,
+                        apply 2-3 months before sowing. Sulfur acts faster but should be applied in warm, moist soil.
+                    </div>
                 </div>
 
                 <!-- Micronutrients -->
                 <div class="guide-section" id="guide-micronutrients">
                     <h4><i class="fas fa-flask"></i> Essential Micronutrients</h4>
-                    <p>Micronutrients are needed in small quantities but are critical for crop health. Deficiencies can severely limit yields even when NPK levels are adequate.</p>
+                    <p>Micronutrients are needed in small quantities but are critical for crop health. Deficiencies can
+                        severely limit yields even when NPK levels are adequate.</p>
                     <table class="guide-table">
-                        <thead><tr><th>Element</th><th>Role</th><th>Deficiency Signs</th><th>Source</th><th>Rate</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Element</th>
+                                <th>Role</th>
+                                <th>Deficiency Signs</th>
+                                <th>Source</th>
+                                <th>Rate</th>
+                            </tr>
+                        </thead>
                         <tbody>
-                            <tr><td><strong>Zinc (Zn)</strong></td><td>Enzyme activation, growth hormones</td><td>Stunted growth, small leaves</td><td>ZnSO4</td><td>25 kg/ha</td></tr>
-                            <tr><td><strong>Iron (Fe)</strong></td><td>Chlorophyll synthesis</td><td>Interveinal chlorosis (yellow between veins)</td><td>FeSO4 or chelated Fe</td><td>50 kg/ha or 0.5% spray</td></tr>
-                            <tr><td><strong>Manganese (Mn)</strong></td><td>Photosynthesis, nitrogen metabolism</td><td>Yellow spots on leaves</td><td>MnSO4</td><td>20-25 kg/ha</td></tr>
-                            <tr><td><strong>Copper (Cu)</strong></td><td>Enzyme activity, grain filling</td><td>Wilting, pale leaf tips</td><td>CuSO4</td><td>10-15 kg/ha</td></tr>
-                            <tr><td><strong>Boron (B)</strong></td><td>Cell wall formation, pollination</td><td>Hollow stems, poor fruit set</td><td>Borax</td><td>10-15 kg/ha</td></tr>
+                            <tr>
+                                <td><strong>Zinc (Zn)</strong></td>
+                                <td>Enzyme activation, growth hormones</td>
+                                <td>Stunted growth, small leaves</td>
+                                <td>ZnSO4</td>
+                                <td>25 kg/ha</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Iron (Fe)</strong></td>
+                                <td>Chlorophyll synthesis</td>
+                                <td>Interveinal chlorosis (yellow between veins)</td>
+                                <td>FeSO4 or chelated Fe</td>
+                                <td>50 kg/ha or 0.5% spray</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Manganese (Mn)</strong></td>
+                                <td>Photosynthesis, nitrogen metabolism</td>
+                                <td>Yellow spots on leaves</td>
+                                <td>MnSO4</td>
+                                <td>20-25 kg/ha</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Copper (Cu)</strong></td>
+                                <td>Enzyme activity, grain filling</td>
+                                <td>Wilting, pale leaf tips</td>
+                                <td>CuSO4</td>
+                                <td>10-15 kg/ha</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Boron (B)</strong></td>
+                                <td>Cell wall formation, pollination</td>
+                                <td>Hollow stems, poor fruit set</td>
+                                <td>Borax</td>
+                                <td>10-15 kg/ha</td>
+                            </tr>
                         </tbody>
                     </table>
-                    <div class="guide-warning"><strong>Boron Warning:</strong> Boron has a very narrow range between deficient and toxic. Never exceed recommended rates. Apply carefully and mix thoroughly with soil.</div>
+                    <div class="guide-warning"><strong>Boron Warning:</strong> Boron has a very narrow range between
+                        deficient and toxic. Never exceed recommended rates. Apply carefully and mix thoroughly with
+                        soil.</div>
                     <h4>Crop-Specific Micronutrient Needs</h4>
                     <ul class="guide-list">
-                        <li><i class="fas fa-check"></i><strong>Rice:</strong> Zinc is critical. Apply ZnSO4 at 25 kg/ha before transplanting.</li>
-                        <li><i class="fas fa-check"></i><strong>Wheat:</strong> Iron and manganese important in alkaline soils.</li>
-                        <li><i class="fas fa-check"></i><strong>Citrus:</strong> Zinc, iron, and manganese often deficient. Foliar spray recommended.</li>
-                        <li><i class="fas fa-check"></i><strong>Cauliflower/Cabbage:</strong> Boron is critical for head formation.</li>
-                        <li><i class="fas fa-check"></i><strong>Potato:</strong> Manganese important for tuber quality.</li>
+                        <li><i class="fas fa-check"></i><strong>Rice:</strong> Zinc is critical. Apply ZnSO4 at 25 kg/ha
+                            before transplanting.</li>
+                        <li><i class="fas fa-check"></i><strong>Wheat:</strong> Iron and manganese important in alkaline
+                            soils.</li>
+                        <li><i class="fas fa-check"></i><strong>Citrus:</strong> Zinc, iron, and manganese often
+                            deficient. Foliar spray recommended.</li>
+                        <li><i class="fas fa-check"></i><strong>Cauliflower/Cabbage:</strong> Boron is critical for head
+                            formation.</li>
+                        <li><i class="fas fa-check"></i><strong>Potato:</strong> Manganese important for tuber quality.
+                        </li>
                     </ul>
                 </div>
 
                 <!-- Soil Testing -->
                 <div class="guide-section" id="guide-testing">
                     <h4><i class="fas fa-microscope"></i> Soil Testing Guide</h4>
-                    <p>Regular soil testing is the foundation of good soil management. It tells you exactly what your soil needs, preventing waste and environmental damage.</p>
+                    <p>Regular soil testing is the foundation of good soil management. It tells you exactly what your
+                        soil needs, preventing waste and environmental damage.</p>
                     <h4>How to Collect Soil Samples</h4>
                     <ul class="guide-list">
-                        <li><i class="fas fa-check"></i>Sample at 0-15 cm depth for most crops; 15-30 cm for deep-rooted crops.</li>
-                        <li><i class="fas fa-check"></i>Collect 15-20 sub-samples in a zigzag pattern across the field.</li>
-                        <li><i class="fas fa-check"></i>Mix all sub-samples in a clean bucket, take 500g as representative sample.</li>
-                        <li><i class="fas fa-check"></i>Label with field name, date, previous crop, and planned crop.</li>
-                        <li><i class="fas fa-check"></i>Avoid sampling immediately after fertilizer application or during waterlogged conditions.</li>
+                        <li><i class="fas fa-check"></i>Sample at 0-15 cm depth for most crops; 15-30 cm for deep-rooted
+                            crops.</li>
+                        <li><i class="fas fa-check"></i>Collect 15-20 sub-samples in a zigzag pattern across the field.
+                        </li>
+                        <li><i class="fas fa-check"></i>Mix all sub-samples in a clean bucket, take 500g as
+                            representative sample.</li>
+                        <li><i class="fas fa-check"></i>Label with field name, date, previous crop, and planned crop.
+                        </li>
+                        <li><i class="fas fa-check"></i>Avoid sampling immediately after fertilizer application or
+                            during waterlogged conditions.</li>
                         <li><i class="fas fa-check"></i>Best time: 2-3 months before sowing season.</li>
                     </ul>
                     <h4>Parameters to Test</h4>
                     <div class="guide-card-grid">
                         <div class="guide-info-card">
                             <h5><i class="fas fa-list"></i> Basic Package</h5>
-                            <p>pH, EC (Electrical Conductivity), Organic Carbon, Available N, P, K. Cost-effective and covers the essentials.</p>
+                            <p>pH, EC (Electrical Conductivity), Organic Carbon, Available N, P, K. Cost-effective and
+                                covers the essentials.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-list-ol"></i> Standard Package</h5>
-                            <p>All basic parameters plus Sulfur, Zinc, Iron, Copper, Manganese, Boron. Recommended for comprehensive management.</p>
+                            <p>All basic parameters plus Sulfur, Zinc, Iron, Copper, Manganese, Boron. Recommended for
+                                comprehensive management.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-clipboard-list"></i> Advanced Package</h5>
-                            <p>All standard parameters plus CEC, soil texture, microbial activity. For research or problem diagnosis.</p>
+                            <p>All standard parameters plus CEC, soil texture, microbial activity. For research or
+                                problem diagnosis.</p>
                         </div>
                     </div>
-                    <div class="guide-tip"><strong>Frequency:</strong> Test soil at least once every 2-3 years. Test annually for high-value crops or when changing farming practices.</div>
+                    <div class="guide-tip"><strong>Frequency:</strong> Test soil at least once every 2-3 years. Test
+                        annually for high-value crops or when changing farming practices.</div>
                 </div>
 
                 <!-- Organic Matter -->
                 <div class="guide-section" id="guide-organic">
                     <h4><i class="fas fa-recycle"></i> Building Organic Matter</h4>
-                    <p>Soil organic matter (SOM) is the cornerstone of soil health. It improves structure, water retention, nutrient cycling, and supports beneficial organisms.</p>
+                    <p>Soil organic matter (SOM) is the cornerstone of soil health. It improves structure, water
+                        retention, nutrient cycling, and supports beneficial organisms.</p>
                     <h4>Target Organic Carbon Levels</h4>
                     <div style="margin-bottom:1rem">
-                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Low</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:25%;background:#ef4444"></div></div><span class="nutrient-bar-value">&lt; 0.5%</span></div>
-                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Medium</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:55%;background:#f59e0b"></div></div><span class="nutrient-bar-value">0.5 - 0.75%</span></div>
-                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Good</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:80%;background:#22c55e"></div></div><span class="nutrient-bar-value">0.75 - 1.0%</span></div>
-                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Excellent</span><div class="nutrient-bar"><div class="nutrient-bar-fill" style="width:100%;background:linear-gradient(90deg,#22c55e,#16a34a)"></div></div><span class="nutrient-bar-value">&gt; 1.0%</span></div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Low</span>
+                            <div class="nutrient-bar">
+                                <div class="nutrient-bar-fill" style="width:25%;background:#ef4444"></div>
+                            </div><span class="nutrient-bar-value">&lt; 0.5%</span>
+                        </div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Medium</span>
+                            <div class="nutrient-bar">
+                                <div class="nutrient-bar-fill" style="width:55%;background:#f59e0b"></div>
+                            </div><span class="nutrient-bar-value">0.5 - 0.75%</span>
+                        </div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Good</span>
+                            <div class="nutrient-bar">
+                                <div class="nutrient-bar-fill" style="width:80%;background:#22c55e"></div>
+                            </div><span class="nutrient-bar-value">0.75 - 1.0%</span>
+                        </div>
+                        <div class="nutrient-bar-container"><span class="nutrient-bar-label">Excellent</span>
+                            <div class="nutrient-bar">
+                                <div class="nutrient-bar-fill"
+                                    style="width:100%;background:linear-gradient(90deg,#22c55e,#16a34a)"></div>
+                            </div><span class="nutrient-bar-value">&gt; 1.0%</span>
+                        </div>
                     </div>
                     <h4>Organic Amendments</h4>
                     <table class="guide-table">
-                        <thead><tr><th>Amendment</th><th>Rate</th><th>NPK Content</th><th>Best For</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Amendment</th>
+                                <th>Rate</th>
+                                <th>NPK Content</th>
+                                <th>Best For</th>
+                            </tr>
+                        </thead>
                         <tbody>
-                            <tr><td>Farmyard Manure (FYM)</td><td>10-15 t/ha</td><td>0.5-0.7% N, 0.3% P, 0.5% K</td><td>All crops, general improvement</td></tr>
-                            <tr><td>Vermicompost</td><td>2-5 t/ha</td><td>1.5-2% N, 1% P, 1.5% K</td><td>Vegetables, nurseries</td></tr>
-                            <tr><td>Compost</td><td>5-10 t/ha</td><td>0.5-1% N, 0.3% P, 0.5% K</td><td>Field crops, orchards</td></tr>
-                            <tr><td>Neem Cake</td><td>250 kg/ha</td><td>5% N, 1% P, 1% K</td><td>Pest suppression + fertility</td></tr>
-                            <tr><td>Green Manure</td><td>Incorporate before flowering</td><td>Varies by species</td><td>Rice, sugarcane rotations</td></tr>
+                            <tr>
+                                <td>Farmyard Manure (FYM)</td>
+                                <td>10-15 t/ha</td>
+                                <td>0.5-0.7% N, 0.3% P, 0.5% K</td>
+                                <td>All crops, general improvement</td>
+                            </tr>
+                            <tr>
+                                <td>Vermicompost</td>
+                                <td>2-5 t/ha</td>
+                                <td>1.5-2% N, 1% P, 1.5% K</td>
+                                <td>Vegetables, nurseries</td>
+                            </tr>
+                            <tr>
+                                <td>Compost</td>
+                                <td>5-10 t/ha</td>
+                                <td>0.5-1% N, 0.3% P, 0.5% K</td>
+                                <td>Field crops, orchards</td>
+                            </tr>
+                            <tr>
+                                <td>Neem Cake</td>
+                                <td>250 kg/ha</td>
+                                <td>5% N, 1% P, 1% K</td>
+                                <td>Pest suppression + fertility</td>
+                            </tr>
+                            <tr>
+                                <td>Green Manure</td>
+                                <td>Incorporate before flowering</td>
+                                <td>Varies by species</td>
+                                <td>Rice, sugarcane rotations</td>
+                            </tr>
                         </tbody>
                     </table>
-                    <div class="guide-tip"><strong>Green Manuring:</strong> Grow dhaincha, sunhemp, or cowpea for 45-60 days and incorporate before flowering. This adds 60-80 kg N/ha naturally and improves soil structure.</div>
+                    <div class="guide-tip"><strong>Green Manuring:</strong> Grow dhaincha, sunhemp, or cowpea for 45-60
+                        days and incorporate before flowering. This adds 60-80 kg N/ha naturally and improves soil
+                        structure.</div>
                 </div>
 
                 <!-- Seasonal Care -->
                 <div class="guide-section" id="guide-seasonal">
                     <h4><i class="fas fa-calendar-alt"></i> Seasonal Soil Management</h4>
-                    <p>Soil care varies by season. Following a seasonal calendar ensures your soil is in the best condition for each crop cycle.</p>
+                    <p>Soil care varies by season. Following a seasonal calendar ensures your soil is in the best
+                        condition for each crop cycle.</p>
                     <div class="guide-card-grid">
                         <div class="guide-info-card">
                             <h5><i class="fas fa-cloud-rain" style="color:#3b82f6"></i> Kharif (Monsoon: Jun-Sep)</h5>
-                            <p>Focus on drainage to prevent waterlogging. Apply full P&K dose at sowing. Split N applications. Build raised beds in heavy soils. Grow green manure crops in fallow fields.</p>
+                            <p>Focus on drainage to prevent waterlogging. Apply full P&K dose at sowing. Split N
+                                applications. Build raised beds in heavy soils. Grow green manure crops in fallow
+                                fields.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-snowflake" style="color:#8b5cf6"></i> Rabi (Winter: Oct-Mar)</h5>
-                            <p>Best time for lime application. Apply full P&K at sowing. Complete N dose in 2 splits. Deep plowing to expose soil to sun. Add organic matter during field preparation.</p>
+                            <p>Best time for lime application. Apply full P&K at sowing. Complete N dose in 2 splits.
+                                Deep plowing to expose soil to sun. Add organic matter during field preparation.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-sun" style="color:#f59e0b"></i> Zaid (Summer: Mar-Jun)</h5>
-                            <p>Minimal tillage to conserve moisture. Heavy mulching (5-10 cm). Grow short-duration green manure. Repair drainage channels. Solarize soil to kill pathogens.</p>
+                            <p>Minimal tillage to conserve moisture. Heavy mulching (5-10 cm). Grow short-duration green
+                                manure. Repair drainage channels. Solarize soil to kill pathogens.</p>
                         </div>
                     </div>
                     <h4>Annual Soil Care Calendar</h4>
                     <table class="guide-table">
-                        <thead><tr><th>Month</th><th>Activity</th><th>Purpose</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Activity</th>
+                                <th>Purpose</th>
+                            </tr>
+                        </thead>
                         <tbody>
-                            <tr><td>Jan-Feb</td><td>Collect soil samples</td><td>Plan fertilizer needs for Kharif</td></tr>
-                            <tr><td>Mar-Apr</td><td>Deep plowing + FYM application</td><td>Soil aeration and organic matter</td></tr>
-                            <tr><td>May</td><td>Apply lime/sulfur if needed</td><td>pH correction (needs 2-3 months)</td></tr>
-                            <tr><td>Jun-Jul</td><td>Sowing + basal P&K</td><td>Foundation nutrition</td></tr>
-                            <tr><td>Aug-Sep</td><td>Top-dress N + drainage</td><td>Mid-season nutrition</td></tr>
-                            <tr><td>Oct-Nov</td><td>Rabi sowing + full P&K</td><td>Winter crop nutrition</td></tr>
-                            <tr><td>Dec</td><td>Green manure in fallow fields</td><td>Nitrogen fixation + structure</td></tr>
+                            <tr>
+                                <td>Jan-Feb</td>
+                                <td>Collect soil samples</td>
+                                <td>Plan fertilizer needs for Kharif</td>
+                            </tr>
+                            <tr>
+                                <td>Mar-Apr</td>
+                                <td>Deep plowing + FYM application</td>
+                                <td>Soil aeration and organic matter</td>
+                            </tr>
+                            <tr>
+                                <td>May</td>
+                                <td>Apply lime/sulfur if needed</td>
+                                <td>pH correction (needs 2-3 months)</td>
+                            </tr>
+                            <tr>
+                                <td>Jun-Jul</td>
+                                <td>Sowing + basal P&K</td>
+                                <td>Foundation nutrition</td>
+                            </tr>
+                            <tr>
+                                <td>Aug-Sep</td>
+                                <td>Top-dress N + drainage</td>
+                                <td>Mid-season nutrition</td>
+                            </tr>
+                            <tr>
+                                <td>Oct-Nov</td>
+                                <td>Rabi sowing + full P&K</td>
+                                <td>Winter crop nutrition</td>
+                            </tr>
+                            <tr>
+                                <td>Dec</td>
+                                <td>Green manure in fallow fields</td>
+                                <td>Nitrogen fixation + structure</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -1972,35 +2806,48 @@
                 <!-- Conservation -->
                 <div class="guide-section" id="guide-conservation">
                     <h4><i class="fas fa-shield-alt"></i> Soil Conservation Practices</h4>
-                    <p>Soil erosion and degradation threaten long-term productivity. These practices protect your most valuable resource.</p>
+                    <p>Soil erosion and degradation threaten long-term productivity. These practices protect your most
+                        valuable resource.</p>
                     <div class="guide-card-grid">
                         <div class="guide-info-card">
                             <h5><i class="fas fa-wind"></i> Contour Farming</h5>
-                            <p>Plow and plant along contour lines (same elevation). Reduces water runoff by 50% and soil loss by 75%. Essential on slopes &gt; 2%.</p>
+                            <p>Plow and plant along contour lines (same elevation). Reduces water runoff by 50% and soil
+                                loss by 75%. Essential on slopes &gt; 2%.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-layer-group"></i> Mulching</h5>
-                            <p>Apply 5-10 cm of crop residue or straw. Reduces evaporation by 25-50%, suppresses weeds, adds organic matter as it decomposes.</p>
+                            <p>Apply 5-10 cm of crop residue or straw. Reduces evaporation by 25-50%, suppresses weeds,
+                                adds organic matter as it decomposes.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-sync-alt"></i> Crop Rotation</h5>
-                            <p>Alternate deep-rooted and shallow-rooted crops. Cereal-legume rotation fixes nitrogen and breaks pest cycles. Never grow the same crop consecutively.</p>
+                            <p>Alternate deep-rooted and shallow-rooted crops. Cereal-legume rotation fixes nitrogen and
+                                breaks pest cycles. Never grow the same crop consecutively.</p>
                         </div>
                         <div class="guide-info-card">
                             <h5><i class="fas fa-tree"></i> Bunding & Terracing</h5>
-                            <p>Build soil bunds on slopes. Terracing converts steep slopes into flat steps. Reduces erosion dramatically on hillside farms.</p>
+                            <p>Build soil bunds on slopes. Terracing converts steep slopes into flat steps. Reduces
+                                erosion dramatically on hillside farms.</p>
                         </div>
                     </div>
                     <h4>Healthy Soil Indicators</h4>
                     <ul class="guide-list">
-                        <li><i class="fas fa-check"></i><strong>Earthworms:</strong> 10+ per shovel = healthy soil biology</li>
-                        <li><i class="fas fa-check"></i><strong>Aggregate stability:</strong> Soil clumps resist crumbling in water</li>
-                        <li><i class="fas fa-check"></i><strong>Water infiltration:</strong> Water soaks in within seconds, not minutes</li>
-                        <li><i class="fas fa-check"></i><strong>Root penetration:</strong> Roots spread easily through the soil profile</li>
-                        <li><i class="fas fa-check"></i><strong>Earthy smell:</strong> Pleasant earthy smell indicates active microbial life</li>
-                        <li><i class="fas fa-check"></i><strong>Dark color:</strong> Darker soil generally means higher organic matter</li>
+                        <li><i class="fas fa-check"></i><strong>Earthworms:</strong> 10+ per shovel = healthy soil
+                            biology</li>
+                        <li><i class="fas fa-check"></i><strong>Aggregate stability:</strong> Soil clumps resist
+                            crumbling in water</li>
+                        <li><i class="fas fa-check"></i><strong>Water infiltration:</strong> Water soaks in within
+                            seconds, not minutes</li>
+                        <li><i class="fas fa-check"></i><strong>Root penetration:</strong> Roots spread easily through
+                            the soil profile</li>
+                        <li><i class="fas fa-check"></i><strong>Earthy smell:</strong> Pleasant earthy smell indicates
+                            active microbial life</li>
+                        <li><i class="fas fa-check"></i><strong>Dark color:</strong> Darker soil generally means higher
+                            organic matter</li>
                     </ul>
-                    <div class="guide-warning"><strong>Warning Signs:</strong> Crusting on surface, standing water after rain, hard compacted layers, pale color, and absence of earthworms indicate degraded soil that needs immediate attention.</div>
+                    <div class="guide-warning"><strong>Warning Signs:</strong> Crusting on surface, standing water after
+                        rain, hard compacted layers, pale color, and absence of earthworms indicate degraded soil that
+                        needs immediate attention.</div>
                 </div>
             </div>
         </div>
@@ -2018,7 +2865,8 @@
                         <span>Help us improve your experience</span>
                     </div>
                 </div>
-                <button class="modal-close" id="feedbackClose" style="color:#fff;opacity:0.8"><i class="fas fa-times"></i></button>
+                <button class="modal-close" id="feedbackClose" style="color:#fff;opacity:0.8"><i
+                        class="fas fa-times"></i></button>
             </div>
             <div class="feedback-body">
                 <div class="feedback-progress">
@@ -2039,8 +2887,10 @@
                 <div class="feedback-q" id="fq2">
                     <h5>Which features did you find most useful?</h5>
                     <div class="feedback-checks">
-                        <label class="feedback-check"><input type="checkbox" value="soil_analysis"> Soil Analysis</label>
-                        <label class="feedback-check"><input type="checkbox" value="fertilizer_selector"> Fertilizer Selector</label>
+                        <label class="feedback-check"><input type="checkbox" value="soil_analysis"> Soil
+                            Analysis</label>
+                        <label class="feedback-check"><input type="checkbox" value="fertilizer_selector"> Fertilizer
+                            Selector</label>
                         <label class="feedback-check"><input type="checkbox" value="chatbot"> Chatbot</label>
                         <label class="feedback-check"><input type="checkbox" value="soil_guide"> Soil Guide</label>
                         <label class="feedback-check"><input type="checkbox" value="dashboard"> Dashboard Stats</label>
@@ -2068,7 +2918,8 @@
                 </div>
                 <div class="feedback-q" id="fq5">
                     <h5>Any suggestions or comments?</h5>
-                    <textarea class="feedback-textarea" id="feedbackComment" placeholder="Share your thoughts, suggestions, or report issues..." rows="4"></textarea>
+                    <textarea class="feedback-textarea" id="feedbackComment"
+                        placeholder="Share your thoughts, suggestions, or report issues..." rows="4"></textarea>
                 </div>
                 <div class="feedback-q" id="fqThanks" style="display:none">
                     <div class="feedback-thanks">
@@ -2079,7 +2930,8 @@
                 </div>
             </div>
             <div class="feedback-nav" id="feedbackNav">
-                <button class="btn btn-secondary" id="feedbackPrev" style="visibility:hidden"><i class="fas fa-arrow-left"></i> Back</button>
+                <button class="btn btn-secondary" id="feedbackPrev" style="visibility:hidden"><i
+                        class="fas fa-arrow-left"></i> Back</button>
                 <button class="btn btn-primary" id="feedbackNext">Next <i class="fas fa-arrow-right"></i></button>
             </div>
         </div>
@@ -2090,7 +2942,9 @@
     <div class="chat-window" id="chatWindow">
         <div class="chat-header">
             <div class="chat-header-icon"><i class="fas fa-seedling"></i></div>
-            <div class="chat-header-info"><h4>Soil Health Assistant</h4><span>Ask about soil, fertilizers & crops</span></div>
+            <div class="chat-header-info">
+                <h4>Soil Health Assistant</h4><span>Ask about soil, fertilizers & crops</span>
+            </div>
         </div>
         <div class="chat-messages" id="chatMessages"></div>
         <div class="chat-input-area">
@@ -2132,6 +2986,15 @@
         profileChip.addEventListener('click', () => profileModal.classList.add('show'));
         document.getElementById('profileModalClose').addEventListener('click', () => profileModal.classList.remove('show'));
         profileModal.addEventListener('click', (e) => { if (e.target === profileModal) profileModal.classList.remove('show'); });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('userProfile');
+            localStorage.removeItem('lastAnalysisInput');
+            localStorage.removeItem('analysesHistory');
+            localStorage.removeItem('lastReportData');
+            window.location.href = 'login.html';
+        });
 
         // Scroll to fertilizer
         document.getElementById('scrollToFert').addEventListener('click', () => {
@@ -2187,13 +3050,13 @@
         loadFertilizerOptions();
 
         // Slider live update
-        document.getElementById('qTemp').addEventListener('input', function() {
+        document.getElementById('qTemp').addEventListener('input', function () {
             document.getElementById('tempVal').textContent = this.value + '\u00B0C';
         });
-        document.getElementById('qHumidity').addEventListener('input', function() {
+        document.getElementById('qHumidity').addEventListener('input', function () {
             document.getElementById('humVal').textContent = this.value + '%';
         });
-        document.getElementById('qMoisture').addEventListener('input', function() {
+        document.getElementById('qMoisture').addEventListener('input', function () {
             document.getElementById('moisVal').textContent = this.value + '%';
         });
 
@@ -2620,7 +3483,7 @@
                         },
                         tooltip: {
                             callbacks: {
-                                label: function(context) {
+                                label: function (context) {
                                     if (!hasData) return 'No data yet';
                                     const val = context.parsed;
                                     const pct = total > 0 ? Math.round((val / total) * 100) : 0;
@@ -2683,30 +3546,30 @@
             const analysis = soilAnalysesData[index];
             if (!analysis) return;
             const inputs = analysis.inputs || {};
-            const keys = ['n','p','k','ph','ec','oc','s','zn','fe','cu','mn','b'];
-            const labels = ['N','P','K','pH','EC','OC','S','Zn','Fe','Cu','Mn','B'];
+            const keys = ['n', 'p', 'k', 'ph', 'ec', 'oc', 's', 'zn', 'fe', 'cu', 'mn', 'b'];
+            const labels = ['N', 'P', 'K', 'pH', 'EC', 'OC', 'S', 'Zn', 'Fe', 'Cu', 'Mn', 'B'];
             const rawVals = keys.map(k => parseFloat(inputs[k]) || 0);
-            const maxRefs = [800,50,700,8.5,1.5,1.5,50,5,15,3,25,3.5];
-            const pctVals = rawVals.map((v,i) => maxRefs[i]>0 ? Math.min((v/maxRefs[i])*100,100) : 0);
-            const optLow = [280,10,200,6.0,0.2,0.5,10,1.0,4.0,0.5,4.0,0.5];
-            const optHigh = [560,25,500,7.5,0.8,1.0,30,3.0,10.0,1.5,15.0,2.0];
-            const barColors = rawVals.map((v,i) => {
-                if(v>=optLow[i]&&v<=optHigh[i]) return '#22c55e';
-                if(v<optLow[i]*0.5||v>optHigh[i]*1.5) return '#ef4444';
+            const maxRefs = [800, 50, 700, 8.5, 1.5, 1.5, 50, 5, 15, 3, 25, 3.5];
+            const pctVals = rawVals.map((v, i) => maxRefs[i] > 0 ? Math.min((v / maxRefs[i]) * 100, 100) : 0);
+            const optLow = [280, 10, 200, 6.0, 0.2, 0.5, 10, 1.0, 4.0, 0.5, 4.0, 0.5];
+            const optHigh = [560, 25, 500, 7.5, 0.8, 1.0, 30, 3.0, 10.0, 1.5, 15.0, 2.0];
+            const barColors = rawVals.map((v, i) => {
+                if (v >= optLow[i] && v <= optHigh[i]) return '#22c55e';
+                if (v < optLow[i] * 0.5 || v > optHigh[i] * 1.5) return '#ef4444';
                 return '#f59e0b';
             });
-            const radarScores = rawVals.map((v,i) => {
-                if(v>=optLow[i]&&v<=optHigh[i]) return 100;
-                if(v<optLow[i]*0.5||v>optHigh[i]*1.5) return 20;
+            const radarScores = rawVals.map((v, i) => {
+                if (v >= optLow[i] && v <= optHigh[i]) return 100;
+                if (v < optLow[i] * 0.5 || v > optHigh[i] * 1.5) return 20;
                 return 60;
             });
-            document.querySelectorAll('.soil-history-item').forEach((el,i) => el.classList.toggle('active',i===index));
+            document.querySelectorAll('.soil-history-item').forEach((el, i) => el.classList.toggle('active', i === index));
             const barCtx = document.getElementById('soilBarChart').getContext('2d');
-            if(soilBarChartInst) soilBarChartInst.destroy();
-            soilBarChartInst = new Chart(barCtx,{type:'bar',data:{labels:labels,datasets:[{data:pctVals,backgroundColor:barColors,borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,ticks:{stepSize:25,font:{size:10}},grid:{color:'#f1f5f9'}},x:{ticks:{font:{size:9}},grid:{display:false}}}}});
+            if (soilBarChartInst) soilBarChartInst.destroy();
+            soilBarChartInst = new Chart(barCtx, { type: 'bar', data: { labels: labels, datasets: [{ data: pctVals, backgroundColor: barColors, borderRadius: 4, borderSkipped: false }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100, ticks: { stepSize: 25, font: { size: 10 } }, grid: { color: '#f1f5f9' } }, x: { ticks: { font: { size: 9 } }, grid: { display: false } } } } });
             const radarCtx = document.getElementById('soilRadarChart').getContext('2d');
-            if(soilRadarChartInst) soilRadarChartInst.destroy();
-            soilRadarChartInst = new Chart(radarCtx,{type:'radar',data:{labels:labels,datasets:[{data:radarScores,backgroundColor:'rgba(34,197,94,0.15)',borderColor:'#22c55e',borderWidth:2,pointBackgroundColor:barColors,pointBorderColor:'#fff',pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{beginAtZero:true,max:100,ticks:{stepSize:25,display:false},pointLabels:{font:{size:9}},grid:{color:'#e5e7eb'}}}}});
+            if (soilRadarChartInst) soilRadarChartInst.destroy();
+            soilRadarChartInst = new Chart(radarCtx, { type: 'radar', data: { labels: labels, datasets: [{ data: radarScores, backgroundColor: 'rgba(34,197,94,0.15)', borderColor: '#22c55e', borderWidth: 2, pointBackgroundColor: barColors, pointBorderColor: '#fff', pointRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { beginAtZero: true, max: 100, ticks: { stepSize: 25, display: false }, pointLabels: { font: { size: 9 } }, grid: { color: '#e5e7eb' } } } } });
         }
         window.renderSoilCharts = renderSoilCharts;
         loadSoilConditions();
@@ -2736,7 +3599,7 @@
             updateFeedbackUI();
         }
 
-        const ratingLabels = ['','Poor','Fair','Good','Very Good','Excellent'];
+        const ratingLabels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
         document.getElementById('ratingExperience').addEventListener('click', (e) => {
             const btn = e.target.closest('.star-btn');
             if (!btn) return;
@@ -2793,7 +3656,7 @@
                     recommend: feedbackData.recommend,
                     comment: feedbackData.comment
                 })
-            }).catch(() => {});
+            }).catch(() => { });
 
             for (let i = 1; i <= 5; i++) document.getElementById('fq' + i).style.display = 'none';
             document.getElementById('fqThanks').style.display = 'block';
@@ -2908,5 +3771,7 @@
         chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } });
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
 </body>
+
 </html>

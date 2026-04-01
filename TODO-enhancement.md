@@ -1,1 +1,0 @@
-# Enhancement: Dashboard Profile Dropdown&#10;&#10;## TODO:&#10;- [ ] Add dropdown menu to profile-chip (View Profile, Settings, Logout)&#10;- [ ] JS toggle on click, close outside&#10;- [ ] CSS styling/animation&#10;- [ ] Test functionality

@@ -1,1 +1,0 @@
-- [x] Step 1: Install dependencies from requirements.txt
