@@ -3,34 +3,64 @@ from datetime import datetime
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, DuplicateKeyError
 import bcrypt
+import time
 
 
 # ---- MongoDB Connection ----
 MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/')
 DB_NAME = 'soil_fertility_db'
 
-try:
-    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
-    client.admin.command('ping')
-    db = client[DB_NAME]
-    users_collection = db['users']
-    users_collection.create_index('email', unique=True)
-    activity_collection = db['activity_log']
-    activity_collection.create_index('email')
-    activity_collection.create_index('timestamp')
-    feedback_collection = db['feedback']
-    feedback_collection.create_index('email')
-    feedback_collection.create_index('timestamp')
-    MONGO_CONNECTED = True
-    print("[DB] Connected to MongoDB successfully")
-except Exception as e:
-    client = None
-    db = None
-    users_collection = None
-    activity_collection = None
-    feedback_collection = None
+client = None
+db = None
+users_collection = None
+activity_collection = None
+feedback_collection = None
+MONGO_CONNECTED = False
+
+
+def connect_mongo(retries=3, delay=2):
+    global client, db, users_collection, activity_collection, feedback_collection, MONGO_CONNECTED
+
+    for attempt in range(retries):
+        try:
+            client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+            client.admin.command('ping')
+            db = client[DB_NAME]
+            users_collection = db['users']
+            users_collection.create_index('email', unique=True)
+            activity_collection = db['activity_log']
+            activity_collection.create_index('email')
+            activity_collection.create_index('timestamp')
+            feedback_collection = db['feedback']
+            feedback_collection.create_index('email')
+            feedback_collection.create_index('timestamp')
+            MONGO_CONNECTED = True
+            print("[DB] Connected to MongoDB successfully")
+            return True
+        except Exception as e:
+            print(f"[DB] MongoDB connection attempt {attempt + 1}/{retries} failed: {e}")
+            if attempt < retries - 1:
+                time.sleep(delay)
+
     MONGO_CONNECTED = False
-    print(f"[DB] MongoDB connection failed: {e}")
+    print("[DB] All MongoDB connection attempts failed. Running without database.")
+    return False
+
+
+connect_mongo()
+
+
+def ensure_connection():
+    global MONGO_CONNECTED
+    if not MONGO_CONNECTED:
+        return connect_mongo()
+    try:
+        client.admin.command('ping')
+        return True
+    except Exception:
+        print("[DB] Ping failed, reconnecting...")
+        MONGO_CONNECTED = False
+        return connect_mongo()
 
 
 def hash_password(password):
@@ -42,7 +72,7 @@ def check_password(password, hashed):
 
 
 def create_user(first_name, last_name, email, password, occupation, country, phone):
-    if not MONGO_CONNECTED:
+    if not ensure_connection():
         return None, "Database is not connected"
 
     if users_collection.find_one({'email': email}):
@@ -76,7 +106,7 @@ def create_user(first_name, last_name, email, password, occupation, country, pho
 
 
 def authenticate_user(email, password):
-    if not MONGO_CONNECTED:
+    if not ensure_connection():
         return None, "Database is not connected"
 
     user = users_collection.find_one({'email': email})
@@ -97,7 +127,7 @@ def authenticate_user(email, password):
 
 
 def get_user_by_email(email):
-    if not MONGO_CONNECTED:
+    if not ensure_connection():
         return None, "Database is not connected"
 
     user = users_collection.find_one({'email': email})
@@ -116,7 +146,7 @@ def get_user_by_email(email):
 
 
 def update_user(email, update_fields):
-    if not MONGO_CONNECTED:
+    if not ensure_connection():
         return None, "Database is not connected"
 
     allowed = ['firstName', 'lastName', 'occupation', 'country', 'phone']
@@ -139,7 +169,7 @@ def update_user(email, update_fields):
 
 
 def log_activity(email, action, details=None):
-    if not MONGO_CONNECTED:
+    if not ensure_connection():
         return
 
     activity_doc = {
@@ -156,7 +186,7 @@ def log_activity(email, action, details=None):
 
 
 def get_user_activity(email, limit=50):
-    if not MONGO_CONNECTED:
+    if not ensure_connection():
         return [], "Database is not connected"
 
     try:
@@ -176,7 +206,7 @@ def get_user_activity(email, limit=50):
 
 
 def get_user_stats(email):
-    if not MONGO_CONNECTED:
+    if not ensure_connection():
         return None, "Database is not connected"
 
     try:
@@ -216,7 +246,7 @@ def get_user_stats(email):
 
 
 def get_user_monthly_activity(email):
-    if not MONGO_CONNECTED:
+    if not ensure_connection():
         return None, "Database is not connected"
 
     try:
@@ -282,7 +312,7 @@ def get_user_monthly_activity(email):
 
 
 def get_recent_soil_analyses(email, limit=5):
-    if not MONGO_CONNECTED:
+    if not ensure_connection():
         return [], "Database is not connected"
 
     try:
@@ -310,7 +340,7 @@ def get_recent_soil_analyses(email, limit=5):
 
 
 def save_feedback(email, rating, features, ease, recommend, comment):
-    if not MONGO_CONNECTED:
+    if not ensure_connection():
         return False, "Database is not connected"
 
     try:
@@ -330,7 +360,7 @@ def save_feedback(email, rating, features, ease, recommend, comment):
 
 
 def get_all_feedback(limit=50):
-    if not MONGO_CONNECTED:
+    if not ensure_connection():
         return [], "Database is not connected"
 
     try:

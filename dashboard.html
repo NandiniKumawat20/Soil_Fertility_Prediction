@@ -2954,7 +2954,7 @@
     </div>
 
     <script>
-        const API = 'http://localhost:5000';
+        const API = 'http://127.0.0.1:5000';
         const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
         const firstName = profile.firstName || 'User';
         const lastName = profile.lastName || '';
@@ -3003,6 +3003,13 @@
 
         // ---- Soil Guide Modal ----
         const guideModal = document.getElementById('guideModal');
+
+        // Loading guards to prevent duplicate API calls
+        let _loadingOptions = false;
+        let _loadingActivity = false;
+        let _loadingStats = false;
+        let _loadingSoil = false;
+        let _loadingFeedback = false;
         document.getElementById('openGuideAction').addEventListener('click', () => guideModal.classList.add('show'));
         document.getElementById('guideModalClose').addEventListener('click', () => guideModal.classList.remove('show'));
         guideModal.addEventListener('click', (e) => { if (e.target === guideModal) guideModal.classList.remove('show'); });
@@ -3024,6 +3031,8 @@
 
         // Load dropdown options from API
         async function loadFertilizerOptions() {
+            if (_loadingOptions) return;
+            _loadingOptions = true;
             try {
                 const res = await fetch(`${API}/api/fertilizer/options`);
                 const data = await res.json();
@@ -3045,6 +3054,8 @@
                 });
             } catch (e) {
                 console.error('Failed to load options:', e);
+            } finally {
+                _loadingOptions = false;
             }
         }
         loadFertilizerOptions();
@@ -3295,7 +3306,8 @@
 
         // ---- Activity from MongoDB ----
         async function loadActivity() {
-            if (!email) return;
+            if (!email || _loadingActivity) return;
+            _loadingActivity = true;
             try {
                 const res = await fetch(`${API}/api/activity/${encodeURIComponent(email)}?limit=10`);
                 const data = await res.json();
@@ -3326,7 +3338,7 @@
                 });
                 html += '</div>';
                 el.innerHTML = html;
-            } catch (e) { /* API unavailable */ }
+            } catch (e) { /* API unavailable */ } finally { _loadingActivity = false; }
         }
         loadActivity();
 
@@ -3341,7 +3353,8 @@
         }
 
         async function loadUsageStats() {
-            if (!email) return;
+            if (!email || _loadingStats) return;
+            _loadingStats = true;
             try {
                 const res = await fetch(`${API}/api/stats/${encodeURIComponent(email)}`);
                 const data = await res.json();
@@ -3374,7 +3387,7 @@
 
                 // Render Donut Chart
                 renderDonutChart(s.soil_analysis, s.soil_reports, fertTotal, s.chatbot);
-            } catch (e) { /* API unavailable */ }
+            } catch (e) { /* API unavailable */ } finally { _loadingStats = false; }
         }
 
         function renderTrendChart(trend) {
@@ -3504,7 +3517,8 @@
         let soilAnalysesData = [];
 
         async function loadSoilConditions() {
-            if (!email) return;
+            if (!email || _loadingSoil) return;
+            _loadingSoil = true;
             try {
                 const res = await fetch(`${API}/api/recent-analyses/${encodeURIComponent(email)}`);
                 const data = await res.json();
@@ -3520,7 +3534,7 @@
                 document.getElementById('soilCondGrid').style.display = '';
                 renderSoilHistory();
                 renderSoilCharts(0);
-            } catch (e) { /* API unavailable */ }
+            } catch (e) { /* API unavailable */ } finally { _loadingSoil = false; }
         }
 
         function renderSoilHistory() {
@@ -3671,6 +3685,8 @@
         document.getElementById("openFeedbackModal").addEventListener("click", () => { feedbackModal.classList.add("show"); resetFeedback(); });
 
         async function loadFeedbackReviews() {
+            if (_loadingFeedback) return;
+            _loadingFeedback = true;
             try {
                 const res = await fetch(API + "/api/feedback");
                 const data = await res.json();
@@ -3695,7 +3711,7 @@
                     html += '</div>';
                 });
                 grid.innerHTML = html;
-            } catch (e) { }
+            } catch (e) { } finally { _loadingFeedback = false; }
         }
         loadFeedbackReviews();
 

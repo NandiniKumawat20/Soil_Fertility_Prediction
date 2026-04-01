@@ -709,7 +709,7 @@
                 const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
                 if (profile.email) answers.email = profile.email;
 
-                const res = await fetch('http://localhost:5000/fertilizer-predict', {
+                const res = await fetch('http://127.0.0.1:5000/fertilizer-predict', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(answers)

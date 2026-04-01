@@ -4,10 +4,26 @@ import pickle
 import numpy as np
 import re
 import csv
+import traceback
 from db import create_user, authenticate_user, get_user_by_email, update_user, log_activity, get_user_activity, get_user_stats, get_user_monthly_activity, get_recent_soil_analyses, save_feedback, get_all_feedback, MONGO_CONNECTED
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+
+
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({'status': 'ok', 'mongo': MONGO_CONNECTED})
+
+
+@app.errorhandler(500)
+def internal_error(e):
+    return jsonify({'success': False, 'error': 'Internal server error'}), 500
+
+
+@app.errorhandler(404)
+def not_found(e):
+    return jsonify({'success': False, 'error': 'Endpoint not found'}), 404
 
 with open('model.pkl', 'rb') as f:
     model = pickle.load(f)
@@ -733,4 +749,4 @@ def fertilizer_recommend():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
