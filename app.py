@@ -7,6 +7,13 @@ import csv
 import traceback
 from db import create_user, authenticate_user, get_user_by_email, update_user, log_activity, get_user_activity, get_user_stats, get_user_monthly_activity, get_recent_soil_analyses, save_feedback, get_all_feedback, MONGO_CONNECTED
 
+# Dataset-based fertilizer predictor (NPK_Distance_Score)
+try:
+    from fertilizer_predictor_dataset_model import FertilizerDatasetPredictor
+except Exception:
+    FertilizerDatasetPredictor = None
+
+
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
@@ -31,40 +38,19 @@ with open('model.pkl', 'rb') as f:
 with open('scaler.pkl', 'rb') as f:
     scaler = pickle.load(f)
 
-with open('fertilizer_model.pkl', 'rb') as f:
-    fert_model = pickle.load(f)
+# Fertilizer dataset predictor (optional)
+_fert_dataset_predictor = None
 
-with open('fertilizer_scaler.pkl', 'rb') as f:
-    fert_scaler = pickle.load(f)
+# Fertilizer ML feature removed
 
-with open('fertilizer_encoders.pkl', 'rb') as f:
-    fert_encoders = pickle.load(f)
 
-# Load fertilizer CSV data
+
+# Fertilizer selector feature removed (CSV-based + ML-based) 
+SOIL_TYPES = []
+CROP_TYPES = []
+FERTILIZER_NAMES = []
 FERTILIZER_CSV_DATA = []
-try:
-    with open('FertilizerPrediction.csv', 'r') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            FERTILIZER_CSV_DATA.append({
-                'temperature': int(row['Temparature']),
-                'humidity': int(row['Humidity '].strip()),
-                'moisture': int(row['Moisture']),
-                'soil_type': row['Soil Type'],
-                'crop_type': row['Crop Type'],
-                'nitrogen': int(row['Nitrogen']),
-                'potassium': int(row['Potassium']),
-                'phosphorous': int(row['Phosphorous']),
-                'fertilizer': row['Fertilizer Name']
-            })
-    print(f"[DATA] Loaded {len(FERTILIZER_CSV_DATA)} fertilizer records from CSV")
-except Exception as e:
-    print(f"[DATA] Could not load fertilizer CSV: {e}")
 
-# Extract unique values from CSV
-SOIL_TYPES = sorted(set(r['soil_type'] for r in FERTILIZER_CSV_DATA))
-CROP_TYPES = sorted(set(r['crop_type'] for r in FERTILIZER_CSV_DATA))
-FERTILIZER_NAMES = sorted(set(r['fertilizer'] for r in FERTILIZER_CSV_DATA))
 
 FEATURES = ['n', 'p', 'k', 'ph', 'ec', 'oc', 's', 'zn', 'fe', 'cu', 'mn', 'b']
 
@@ -115,8 +101,15 @@ RECOMMENDATIONS = {
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        data = request.get_json()
-        values = [float(data[f]) for f in FEATURES]
+        data = request.get_json() or {}
+
+        # Build feature vector matching the scaler/model.
+        # If some features are missing from the frontend payload,
+        # fill them with 0 (safer than crashing) so analysis can still run.
+        values = []
+        for f in FEATURES:
+            raw = data.get(f, 0)
+            values.append(float(raw))
         values_scaled = scaler.transform([values])
         prediction = int(model.predict(values_scaled)[0])
         probabilities = model.predict_proba(values_scaled)[0]
@@ -129,6 +122,33 @@ def predict():
                 'inputs': {f: data[f] for f in FEATURES}
             })
 
+        # Optional: also provide fertilizer suggestion from dataset model
+        fertilizer_suggestion = None
+        try:
+            if _fert_dataset_predictor is not None:
+                # Use provided soil/crop context if available; otherwise fall back.
+                # Frontend for soil analysis may not send these keys.
+                soil_type = data.get('soil_type', '') or 'Loamy'
+                crop_type = data.get('crop_type', '') or 'Wheat'
+                # If temperature/humidity/moisture are not provided, use reasonable defaults.
+                temperature = float(data.get('temperature', 25))
+                humidity = float(data.get('humidity', 50))
+                moisture = float(data.get('moisture', 40))
+
+                fert_result = _fert_dataset_predictor.predict_best_fertilizer(
+                    soil_type=soil_type,
+                    crop_type=crop_type,
+                    temperature=temperature,
+                    humidity=humidity,
+                    moisture=moisture,
+                )
+                fertilizer_suggestion = {
+                    'fertilizer_name': fert_result.get('fertilizer_name'),
+                    'predicted_score': fert_result.get('predicted_score'),
+                }
+        except Exception:
+            fertilizer_suggestion = None
+
         return jsonify({
             'success': True,
             'prediction': prediction,
@@ -137,14 +157,74 @@ def predict():
             'confidence': round(float(max(probabilities)) * 100, 1),
             'probabilities': {
                 LABELS[i]: round(float(p) * 100, 1) for i, p in enumerate(probabilities)
-            }
+            },
+            'fertilizer_suggestion': fertilizer_suggestion
         })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+
+@app.route('/fertilizer-predict', methods=['POST'])
+def fertilizer_predict():
+    try:
+        data = request.get_json() or {}
+        email = data.get('email', '')
+
+        if _fert_dataset_predictor is None:
+            return jsonify({'success': False, 'error': 'Fertility dataset model not available'}), 500
+
+        soil_type = data.get('soil_type', '')
+        crop_type = data.get('crop_type', '')
+
+        # Temperature/Humidity/Moisture are numeric
+        temperature = float(data.get('temperature', 25))
+        humidity = float(data.get('humidity', 50))
+        moisture = float(data.get('moisture', 40))
+
+        result = _fert_dataset_predictor.predict_best_fertilizer(
+            soil_type=soil_type,
+            crop_type=crop_type,
+            temperature=temperature,
+            humidity=humidity,
+            moisture=moisture,
+        )
+
+        # Build response compatible with existing frontend
+        top = {
+            'name': result['fertilizer_name'],
+            'npk': None,
+            'confidence': round(result['predicted_score'], 2),
+            'description': '',
+            'application': '',
+            'crops': '',
+            'tips': ''
+        }
+
+        # Alternatives: we simply reuse top_k filtering by asking predictor model many times.
+        # For simplicity (and to keep it stable), we return duplicates if not available.
+        response = {
+            'success': True,
+            'top_recommendations': [top],
+            'ph_advice': '',
+            'stage_advice': '',
+            'organic_note': ''
+        }
+
+        if email:
+            log_activity(email, 'fertilizer_prediction', {
+                'fertilizer': top['name'],
+                'top_result': top['name'],
+                'score': result['predicted_score']
+            })
+
+        return jsonify(response)
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
 
 @app.route('/report', methods=['POST'])
 def report():
+
     try:
         data = request.get_json()
         nutrient_analysis = []
@@ -219,364 +299,23 @@ def report():
         return jsonify({'success': False, 'error': str(e)}), 400
 
 
-FERTILIZER_INFO = {
-    'Urea': {
-        'npk': '46-0-0',
-        'description': 'Urea is the most concentrated nitrogen fertilizer. It provides a quick boost of nitrogen for leafy growth and overall plant vigor.',
-        'application': 'Apply 100-150 kg/ha in split doses - at sowing and during vegetative growth. Best applied in moist soil, avoid surface application in hot weather.',
-        'crops': 'Best for: Wheat, Rice, Maize, Sugarcane, Cotton - crops with high nitrogen demand.',
-        'tips': 'Incorporate into soil within 24 hours to prevent nitrogen loss through volatilization.'
-    },
-    'DAP': {
-        'npk': '18-46-0',
-        'description': 'Diammonium Phosphate provides both nitrogen and phosphorus. Excellent for root development and early crop establishment.',
-        'application': 'Apply 50-75 kg/ha at the time of sowing/planting. Place near the seed for best results.',
-        'crops': 'Best for: All crops, especially during early growth stages. Ideal for Paddy, Wheat, Cotton.',
-        'tips': 'DAP has a high pH around the granule which can help reduce aluminum toxicity in acidic soils.'
-    },
-    '10-26-26': {
-        'npk': '10-26-26',
-        'description': 'A complex fertilizer with balanced phosphorus and potassium. Good for crops needing strong root and fruit development.',
-        'application': 'Apply 100-125 kg/ha as basal dose before sowing.',
-        'crops': 'Best for: Pulses, Oil seeds, Vegetables - crops needing good P and K.',
-        'tips': 'Use in soils that already have adequate nitrogen but need P and K supplementation.'
-    },
-    '14-35-14': {
-        'npk': '14-35-14',
-        'description': 'High phosphorus fertilizer ideal for root establishment and flowering stages.',
-        'application': 'Apply 75-100 kg/ha at sowing or transplanting.',
-        'crops': 'Best for: Cotton, Ground Nuts, Sugarcane - crops with long duration needing strong roots.',
-        'tips': 'Especially useful in newly reclaimed or low-phosphorus soils.'
-    },
-    '17-17-17': {
-        'npk': '17-17-17',
-        'description': 'A perfectly balanced NPK fertilizer providing equal parts of all three macronutrients.',
-        'application': 'Apply 100-150 kg/ha as a general-purpose basal fertilizer.',
-        'crops': 'Best for: All crops as a balanced starter. Works well for Maize, Barley, Millets.',
-        'tips': 'Versatile fertilizer suitable when soil test shows balanced deficiency across N, P, and K.'
-    },
-    '20-20': {
-        'npk': '20-20-0',
-        'description': 'Provides equal nitrogen and phosphorus without potassium. Good when soil K is already sufficient.',
-        'application': 'Apply 75-100 kg/ha at sowing and top-dress with urea if needed.',
-        'crops': 'Best for: Crops in potassium-rich soils. Wheat, Maize, Paddy.',
-        'tips': 'Check soil K levels before use. Add MOP separately if potassium is low.'
-    },
-    '28-28': {
-        'npk': '28-28-0',
-        'description': 'High concentration NPK without potassium. Efficient for quick N and P supply.',
-        'application': 'Apply 50-75 kg/ha. Lower dose needed due to high concentration.',
-        'crops': 'Best for: Millets, Tobacco, Maize - crops with moderate K needs.',
-        'tips': 'Cost-effective option when only N and P supplementation is required.'
-    }
-}
+
+# Fertilizer ML feature removed
+FERTILIZER_INFO = {}
+
+# Dataset-based fertilizer recommendation (from Fertility_Dataset.csv)
+try:
+    if FertilizerDatasetPredictor is not None:
+        _fert_dataset_predictor = FertilizerDatasetPredictor(
+            model_path="fertility_dataset_npk_distance_rf.joblib",
+            dataset_path="Fertility_Dataset.csv",
+        )
+    else:
+        _fert_dataset_predictor = None
+except Exception:
+    _fert_dataset_predictor = None
 
 
-@app.route('/fertilizer-predict', methods=['POST'])
-def fertilizer_predict():
-    try:
-        data = request.get_json()
-        soil_type = data.get('soil_type', '')
-        crop_type = data.get('crop_type', '')
-        temperature = float(data.get('temperature', 25))
-        humidity = float(data.get('humidity', 50))
-        moisture = float(data.get('moisture', 40))
-        nitrogen = float(data.get('nitrogen', 20))
-        phosphorus = float(data.get('phosphorus', 10))
-        potassium = float(data.get('potassium', 5))
-        soil_ph = data.get('soil_ph', 'neutral')
-        growth_stage = data.get('growth_stage', '')
-        preference = data.get('preference', 'chemical')
-
-        # Encode categorical
-        soil_encoded = fert_encoders['soil'].transform([soil_type])[0]
-        crop_encoded = fert_encoders['crop'].transform([crop_type])[0]
-
-        # Prepare features
-        features = np.array([[temperature, humidity, moisture, soil_encoded, crop_encoded, nitrogen, potassium, phosphorus]])
-        features_scaled = fert_scaler.transform(features)
-
-        # Predict
-        prediction_idx = int(fert_model.predict(features_scaled)[0])
-        probabilities = fert_model.predict_proba(features_scaled)[0]
-        fertilizer_name = fert_encoders['fertilizer'].inverse_transform([prediction_idx])[0]
-
-        # Get top 3 recommendations
-        top_indices = np.argsort(probabilities)[::-1][:3]
-        top_recommendations = []
-        for idx in top_indices:
-            fname = fert_encoders['fertilizer'].inverse_transform([idx])[0]
-            prob = round(float(probabilities[idx]) * 100, 1)
-            if prob > 0:
-                info = FERTILIZER_INFO.get(fname, {})
-                top_recommendations.append({
-                    'name': fname,
-                    'npk': info.get('npk', ''),
-                    'confidence': prob,
-                    'description': info.get('description', ''),
-                    'application': info.get('application', ''),
-                    'crops': info.get('crops', ''),
-                    'tips': info.get('tips', '')
-                })
-
-        # Generate pH-based advice
-        ph_advice = ''
-        if soil_ph == 'acidic':
-            ph_advice = 'Your soil is acidic. Consider applying agricultural lime (1-2 tonnes/ha) before fertilizer application to improve nutrient availability.'
-        elif soil_ph == 'alkaline':
-            ph_advice = 'Your soil is alkaline. Apply eleite sulfur or gypsum to lower pH. Micronutrients like iron and zinc may be less available.'
-        else:
-            ph_advice = 'Your soil pH is neutral, which is ideal for most nutrient availability.'
-
-        # Growth stage advice
-        stage_advice = ''
-        if growth_stage == 'seedling':
-            stage_advice = 'At seedling stage, phosphorus is critical for root establishment. The recommended fertilizer will support early growth.'
-        elif growth_stage == 'vegetative':
-            stage_advice = 'During vegetative growth, nitrogen is essential for leaf and stem development. Split nitrogen applications are recommended.'
-        elif growth_stage == 'flowering':
-            stage_advice = 'At flowering stage, phosphorus and potassium are important for flower development and pollination success.'
-        elif growth_stage == 'fruiting':
-            stage_advice = 'During fruiting, potassium is critical for fruit quality and size. Avoid excess nitrogen which can reduce fruit set.'
-        else:
-            stage_advice = 'Select a growth stage for more specific timing advice.'
-
-        # Organic preference note
-        organic_note = ''
-        if preference == 'organic':
-            organic_note = 'Since you prefer organic farming, supplement the recommended fertilizer with: Farmyard Manure (10-15 t/ha), Vermicompost (2-5 t/ha), and Neem Cake (250 kg/ha) for sustained nutrient release and soil health improvement.'
-        elif preference == 'both':
-            organic_note = 'For integrated nutrient management, combine the recommended chemical fertilizer with organic sources like FYM (5-10 t/ha) or vermicompost for better soil biology and sustained nutrition.'
-
-        email = data.get('email', '')
-        if email:
-            log_activity(email, 'fertilizer_prediction', {
-                'fertilizer': fertilizer_name,
-                'soil_type': soil_type,
-                'crop_type': crop_type
-            })
-
-        return jsonify({
-            'success': True,
-            'fertilizer': fertilizer_name,
-            'info': FERTILIZER_INFO.get(fertilizer_name, {}),
-            'top_recommendations': top_recommendations,
-            'ph_advice': ph_advice,
-            'stage_advice': stage_advice,
-            'organic_note': organic_note,
-            'inputs': {
-                'soil_type': soil_type,
-                'crop_type': crop_type,
-                'temperature': temperature,
-                'humidity': humidity,
-                'moisture': moisture,
-                'nitrogen': nitrogen,
-                'phosphorus': phosphorus,
-                'potassium': potassium
-            }
-        })
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
-
-
-CHATBOT_KB = [
-    {
-        'keywords': ['hello', 'hi', 'hey', 'namaste', 'good morning', 'good evening'],
-        'response': "Hello! I'm your Soil Health Assistant. Ask me anything about soil fertility, fertilizers, crop management, or nutrient deficiencies. How can I help you today?"
-    },
-    {
-        'keywords': ['nitrogen', 'n deficiency', 'nitrogen deficient', 'yellow leaves', 'chlorosis'],
-        'response': "**Nitrogen (N) Deficiency:**\n- Symptoms: Yellowing of older/lower leaves, stunted growth, pale green color.\n- Solution: Apply urea (46-0-0) at 100-150 kg/ha or ammonium sulfate (21-0-0) at 200-300 kg/ha.\n- Organic: Use farmyard manure, compost, or grow legumes (moong, urad) to fix atmospheric nitrogen.\n- Ideal range: 280-560 kg/ha."
-    },
-    {
-        'keywords': ['phosphorus', 'p deficiency', 'phosphorus deficient', 'purple leaves'],
-        'response': "**Phosphorus (P) Deficiency:**\n- Symptoms: Purple/reddish discoloration of leaves, poor root development, delayed maturity.\n- Solution: Apply DAP (18-46-0) at 50-75 kg/ha or Single Super Phosphate (SSP) at 150-200 kg/ha.\n- Organic: Add bone meal, rock phosphate, or farmyard manure.\n- Ideal range: 10-25 kg/ha."
-    },
-    {
-        'keywords': ['potassium', 'k deficiency', 'potassium deficient', 'brown edges', 'leaf burn'],
-        'response': "**Potassium (K) Deficiency:**\n- Symptoms: Brown/scorched leaf edges (leaf burn), weak stems, poor fruit quality.\n- Solution: Apply Muriate of Potash (MOP) at 50-100 kg/ha or Sulfate of Potash (SOP).\n- Organic: Use wood ash, banana peels, or green manure crops.\n- Ideal range: 200-500 kg/ha."
-    },
-    {
-        'keywords': ['ph', 'acidic', 'alkaline', 'lime', 'soil acidity', 'soil alkalinity'],
-        'response': "**Soil pH Management:**\n- Ideal pH: 6.0-7.5 for most crops.\n- Too Acidic (pH < 5.5): Apply agricultural lime (CaCO3) at 1-2 tonnes/ha. Dolomite lime also adds magnesium.\n- Too Alkaline (pH > 8.5): Apply elemental sulfur, aluminum sulfate, or use acidic mulches (pine needles).\n- Most nutrients are best available at pH 6.5-7.0."
-    },
-    {
-        'keywords': ['organic', 'organic farming', 'compost', 'vermicompost', 'natural'],
-        'response': "**Organic Soil Management:**\n- **Compost:** Apply 5-10 tonnes/ha of well-decomposed compost.\n- **Vermicompost:** Apply 2-5 tonnes/ha for rich micronutrients.\n- **Green Manuring:** Grow dhaincha, sunhemp, or cowpea and incorporate before flowering.\n- **Farmyard Manure:** Apply 10-15 tonnes/ha during field preparation.\n- **Mulching:** Use crop residue mulch to retain moisture and add organic matter."
-    },
-    {
-        'keywords': ['fertilizer', 'npk', 'urea', 'dap', 'mop', 'fertiliser', 'chemical'],
-        'response': "**NPK Fertilizer Guide:**\n- **Urea (46-0-0):** Primary nitrogen source. Apply in split doses.\n- **DAP (18-46-0):** Good source of N and P. Apply at sowing.\n- **MOP (0-0-60):** Potassium source. Apply before last irrigation.\n- **SSP (0-16-0-11):** Provides P and S. Good for deficient soils.\n- Always do soil testing before applying fertilizers."
-    },
-    {
-        'keywords': ['wheat', 'rice', 'paddy', 'maize', 'corn', 'cotton', 'sugarcane', 'crop'],
-        'response': "**Crop-Specific Tips:**\n- **Wheat:** Needs good N and P. Apply 120 kg N + 60 kg P2O5 + 40 kg K2O per ha.\n- **Rice/Paddy:** Needs flooded conditions. Apply N in 3 splits. Zinc is critical.\n- **Maize:** Heavy feeder. Needs 150 kg N + 75 kg P2O5 + 50 kg K2O per ha.\n- **Cotton:** Long duration crop. Needs balanced NPK + micronutrients.\n- **Sugarcane:** Very heavy feeder. Needs 250-300 kg N per ha in splits."
-    },
-    {
-        'keywords': ['micronutrient', 'zinc', 'iron', 'manganese', 'copper', 'boron', 'micronutrients'],
-        'response': "**Micronutrient Guide:**\n- **Zinc (Zn):** Apply ZnSO4 at 25 kg/ha. Critical for rice, wheat, maize.\n- **Iron (Fe):** Apply FeSO4 at 50 kg/ha or chelated iron spray.\n- **Manganese (Mn):** Apply MnSO4 at 20-25 kg/ha. Spray at 0.5%.\n- **Copper (Cu):** Apply CuSO4 at 10-15 kg/ha.\n- **Boron (B):** Apply borax at 10-15 kg/ha."
-    },
-    {
-        'keywords': ['irrigation', 'water', 'drip', 'flood', 'rain', 'moisture'],
-        'response': "**Irrigation & Soil Health:**\n- Drip irrigation saves 40-60% water and improves nutrient uptake.\n- Apply fertilizers with irrigation (fertigation) for better efficiency.\n- Maintain soil moisture at 50-70% field capacity.\n- Mulching reduces water evaporation by 25-50%."
-    },
-    {
-        'keywords': ['test', 'soil test', 'testing', 'sample', 'lab', 'analysis'],
-        'response': "**How to Get Your Soil Tested:**\n1. Collect samples from 15-20 spots across your field (0-15 cm depth).\n2. Mix well and take 500g as representative sample.\n3. Send to nearest soil testing lab.\n4. Test for: pH, EC, OC, N, P, K, S, Zn, Fe, Cu, Mn, B.\n5. Results take 7-15 days."
-    },
-    {
-        'keywords': ['season', 'kharif', 'rabi', 'summer', 'winter', 'monsoon', 'rainy'],
-        'response': "**Seasonal Soil Management:**\n- **Kharif (Monsoon):** Focus on drainage, apply P & K before sowing.\n- **Rabi (Winter):** Good time for lime application. Apply full dose of P & K at sowing.\n- **Summer:** Minimal tillage, mulching to conserve moisture, grow green manure crops."
-    },
-    {
-        'keywords': ['pest', 'disease', 'insect', 'fungus', 'weed', 'protection'],
-        'response': "**Soil Health & Pest Management:**\n- Healthy soil = fewer pests and diseases.\n- Crop rotation breaks pest cycles.\n- Neem cake (250 kg/ha) is both organic fertilizer and pest repellent.\n- Excessive nitrogen attracts pests."
-    },
-    {
-        'keywords': ['thank', 'thanks', 'dhanyavaad', 'shukriya'],
-        'response': "You're welcome! Happy to help with your farming needs. Feel free to ask more questions about soil health anytime."
-    },
-    {
-        'keywords': ['help', 'what can you do', 'how to use', 'features'],
-        'response': "**I can help you with:**\n- Nutrient deficiencies (N, P, K, micronutrients)\n- Fertilizer recommendations\n- Soil pH management\n- Crop-specific guidance\n- Irrigation tips\n- Seasonal soil care\n- Pest & disease prevention\n\nJust type your question naturally!"
-    }
-]
-
-
-def get_chatbot_response(message):
-    msg = message.lower().strip()
-    scores = []
-    for entry in CHATBOT_KB:
-        score = sum(1 for kw in entry['keywords'] if kw in msg)
-        if score > 0:
-            scores.append((score, entry['response']))
-    if scores:
-        scores.sort(key=lambda x: x[0], reverse=True)
-        return scores[0][1]
-    return "I'm not sure about that. I specialize in soil fertility and farming topics. Try asking about:\n- Nutrient deficiencies\n- Fertilizer recommendations\n- Soil pH management\n- Crop-specific advice\n- Organic farming methods\n\nType 'help' to see all topics!"
-
-
-@app.route('/chat', methods=['POST'])
-def chat():
-    try:
-        data = request.get_json()
-        message = data.get('message', '').strip()
-        if not message:
-            return jsonify({'success': False, 'error': 'No message provided'}), 400
-
-        email = data.get('email', '')
-        if email:
-            log_activity(email, 'chat', {'message': message})
-
-        reply = get_chatbot_response(message)
-        return jsonify({'success': True, 'response': reply, 'source': 'local'})
-
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
-
-
-@app.route('/api/register', methods=['POST'])
-def register():
-    try:
-        data = request.get_json()
-        first_name = data.get('firstName', '').strip()
-        last_name = data.get('lastName', '').strip()
-        email = data.get('email', '').strip().lower()
-        password = data.get('password', '')
-        occupation = data.get('occupation', '').strip()
-        country = data.get('country', '').strip()
-        phone = data.get('phone', '').strip()
-
-        if not all([first_name, last_name, email, password, country]):
-            return jsonify({'success': False, 'error': 'All required fields must be filled'}), 400
-
-        if len(password) < 8:
-            return jsonify({'success': False, 'error': 'Password must be at least 8 characters'}), 400
-
-        user, error = create_user(first_name, last_name, email, password, occupation, country, phone)
-        if error:
-            status = 409 if 'already' in error.lower() else 500
-            return jsonify({'success': False, 'error': error}), status
-
-        return jsonify({
-            'success': True,
-            'message': 'Registration successful',
-            'user': user
-        }), 201
-
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/api/login', methods=['POST'])
-def login():
-    try:
-        data = request.get_json()
-        email = data.get('email', '').strip().lower()
-        password = data.get('password', '')
-
-        if not email or not password:
-            return jsonify({'success': False, 'error': 'Email and password are required'}), 400
-
-        user, error = authenticate_user(email, password)
-        if error:
-            return jsonify({'success': False, 'error': error}), 401
-
-        log_activity(email, 'login', {'email': email})
-
-        return jsonify({
-            'success': True,
-            'message': 'Login successful',
-            'user': user
-        })
-
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/api/logout', methods=['POST'])
-def logout():
-    try:
-        data = request.get_json()
-        email = data.get('email', '').strip().lower()
-        if email:
-            log_activity(email, 'logout', {'email': email})
-        return jsonify({'success': True, 'message': 'Logged out'})
-
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/api/profile/<email>', methods=['GET'])
-def get_profile(email):
-    try:
-        user, error = get_user_by_email(email.strip().lower())
-        if error:
-            return jsonify({'success': False, 'error': error}), 404
-
-        return jsonify({'success': True, 'user': user})
-
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/api/profile/<email>', methods=['PUT'])
-def update_profile(email):
-    try:
-        data = request.get_json()
-        user, error = update_user(email.strip().lower(), data)
-        if error:
-            status = 404 if 'not found' in error.lower() else 400
-            return jsonify({'success': False, 'error': error}), status
-
-        return jsonify({
-            'success': True,
-            'message': 'Profile updated',
-            'user': user
-        })
-
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @app.route('/api/activity/<email>', methods=['GET'])
@@ -603,9 +342,11 @@ def get_stats(email):
 
         trend, trend_err = get_user_monthly_activity(email_lower)
         if trend_err:
-            trend = {'labels': [], 'soil_analysis': [], 'fertilizer': [], 'chatbot': []}
+            trend = {'labels': [], 'soil_analysis': [], 'chatbot': []}
+
 
         return jsonify({'success': True, 'stats': stats, 'trend': trend})
+
 
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -659,94 +400,6 @@ def get_feedback():
 
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/api/fertilizer/options', methods=['GET'])
-def fertilizer_options():
-    return jsonify({
-        'success': True,
-        'soil_types': SOIL_TYPES,
-        'crop_types': CROP_TYPES,
-        'fertilizer_names': FERTILIZER_NAMES
-    })
-
-
-@app.route('/api/fertilizer/recommend', methods=['POST'])
-def fertilizer_recommend():
-    try:
-        data = request.get_json()
-        soil_type = data.get('soil_type', '')
-        crop_type = data.get('crop_type', '')
-        nitrogen = data.get('nitrogen')
-        potassium = data.get('potassium')
-        phosphorous = data.get('phosphorous')
-
-        # Filter CSV data based on selections
-        matches = FERTILIZER_CSV_DATA
-        if soil_type:
-            matches = [r for r in matches if r['soil_type'].lower() == soil_type.lower()]
-        if crop_type:
-            matches = [r for r in matches if r['crop_type'].lower() == crop_type.lower()]
-        if nitrogen is not None:
-            n = int(nitrogen)
-            matches = [r for r in matches if abs(r['nitrogen'] - n) <= 10]
-        if potassium is not None:
-            k = int(potassium)
-            matches = [r for r in matches if abs(r['potassium'] - k) <= 10]
-        if phosphorous is not None:
-            p = int(phosphorous)
-            matches = [r for r in matches if abs(r['phosphorous'] - p) <= 10]
-
-        if not matches:
-            return jsonify({'success': True, 'recommendations': [], 'message': 'No matching records found. Try different filters.'})
-
-        # Count fertilizer occurrences
-        fert_count = {}
-        for r in matches:
-            fname = r['fertilizer']
-            if fname not in fert_count:
-                fert_count[fname] = {'count': 0, 'avg_n': 0, 'avg_k': 0, 'avg_p': 0, 'records': []}
-            fert_count[fname]['count'] += 1
-            fert_count[fname]['records'].append(r)
-
-        # Calculate averages and build recommendations
-        recommendations = []
-        for fname, info in sorted(fert_count.items(), key=lambda x: x[1]['count'], reverse=True):
-            recs = info['records']
-            avg_n = sum(r['nitrogen'] for r in recs) / len(recs)
-            avg_k = sum(r['potassium'] for r in recs) / len(recs)
-            avg_p = sum(r['phosphorous'] for r in recs) / len(recs)
-            confidence = round(info['count'] / len(matches) * 100, 1)
-            recommendations.append({
-                'fertilizer': fname,
-                'confidence': confidence,
-                'match_count': info['count'],
-                'avg_nitrogen': round(avg_n, 1),
-                'avg_potassium': round(avg_k, 1),
-                'avg_phosphorous': round(avg_p, 1),
-                'sample_crops': list(set(r['crop_type'] for r in recs))[:5],
-                'sample_soils': list(set(r['soil_type'] for r in recs))[:5]
-            })
-
-        email = data.get('email', '')
-        if email:
-            log_activity(email, 'fertilizer_selector', {
-                'soil_type': soil_type,
-                'crop_type': crop_type,
-                'top_result': recommendations[0]['fertilizer'] if recommendations else None,
-                'total_matches': len(matches)
-            })
-
-        return jsonify({
-            'success': True,
-            'recommendations': recommendations,
-            'total_matches': len(matches),
-            'filters': {'soil_type': soil_type, 'crop_type': crop_type}
-        })
-
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

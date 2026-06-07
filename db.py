@@ -219,8 +219,7 @@ def get_user_stats(email):
         stats = {
             'soil_analysis': 0,
             'soil_reports': 0,
-            'fertilizer_predictions': 0,
-            'fertilizer_selector': 0,
+
             'chatbot': 0,
             'total_actions': 0
         }
@@ -232,12 +231,9 @@ def get_user_stats(email):
                 stats['soil_analysis'] = count
             elif action == 'soil_report':
                 stats['soil_reports'] = count
-            elif action == 'fertilizer_prediction':
-                stats['fertilizer_predictions'] = count
-            elif action == 'fertilizer_selector':
-                stats['fertilizer_selector'] = count
             elif action == 'chat':
                 stats['chatbot'] = count
+
             stats['total_actions'] += count
 
         return stats, None
@@ -270,7 +266,7 @@ def get_user_monthly_activity(email):
 
         months = []
         soil_data = []
-        fert_data = []
+
         chat_data = []
 
         month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -280,8 +276,9 @@ def get_user_monthly_activity(email):
             label = month_names[d.month - 1] + ' ' + str(d.year)[2:]
             months.append(label)
             soil_data.append(0)
-            fert_data.append(0)
             chat_data.append(0)
+
+
 
         for r in results:
             y = r['_id']['year']
@@ -295,18 +292,18 @@ def get_user_monthly_activity(email):
                     idx = 5 - i
                     if action in ('soil_prediction', 'soil_report'):
                         soil_data[idx] += count
-                    elif action in ('fertilizer_prediction', 'fertilizer_selector'):
-                        fert_data[idx] += count
                     elif action == 'chat':
                         chat_data[idx] += count
+
                     break
 
         return {
             'labels': months,
             'soil_analysis': soil_data,
-            'fertilizer': fert_data,
             'chatbot': chat_data
         }, None
+
+
     except Exception as e:
         return None, str(e)
 
@@ -340,8 +337,11 @@ def get_recent_soil_analyses(email, limit=5):
 
 
 def save_feedback(email, rating, features, ease, recommend, comment):
+    # Mongo is optional. If not connected, degrade gracefully.
     if not ensure_connection():
-        return False, "Database is not connected"
+        return True, None
+
+
 
     try:
         feedback_doc = {
@@ -361,7 +361,8 @@ def save_feedback(email, rating, features, ease, recommend, comment):
 
 def get_all_feedback(limit=50):
     if not ensure_connection():
-        return [], "Database is not connected"
+        return [], None
+
 
     try:
         cursor = feedback_collection.find(

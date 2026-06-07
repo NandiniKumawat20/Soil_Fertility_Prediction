@@ -425,18 +425,77 @@
 
             <form id="analysisForm">
                 <div class="feature-grid">
-                    <div class="field-item"><label for="n">N</label><input type="number" id="n" name="n" step="any" min="0" required></div>
-                    <div class="field-item"><label for="p">P</label><input type="number" id="p" name="p" step="any" min="0" required></div>
-                    <div class="field-item"><label for="k">K</label><input type="number" id="k" name="k" step="any" min="0" required></div>
-                    <div class="field-item"><label for="ph">pH</label><input type="number" id="ph" name="ph" step="any" min="0" required></div>
-                    <div class="field-item"><label for="ec">EC</label><input type="number" id="ec" name="ec" step="any" min="0" required></div>
-                    <div class="field-item"><label for="oc">OC</label><input type="number" id="oc" name="oc" step="any" min="0" required></div>
-                    <div class="field-item"><label for="s">S</label><input type="number" id="s" name="s" step="any" min="0" required></div>
-                    <div class="field-item"><label for="zn">Zn</label><input type="number" id="zn" name="zn" step="any" min="0" required></div>
-                    <div class="field-item"><label for="fe">Fe</label><input type="number" id="fe" name="fe" step="any" min="0" required></div>
-                    <div class="field-item"><label for="cu">Cu</label><input type="number" id="cu" name="cu" step="any" min="0" required></div>
-                    <div class="field-item"><label for="mn">Mn</label><input type="number" id="mn" name="mn" step="any" min="0" required></div>
-                    <div class="field-item"><label for="b">B</label><input type="number" id="b" name="b" step="any" min="0" required></div>
+                    <div class="field-item">
+                        <label for="soil_type">Soil Type</label>
+                        <select id="soil_type" name="soil_type" required>
+                            <option value="" selected disabled>Select soil type</option>
+                            <option value="Clayey">Clayey</option>
+                            <option value="Loamy">Loamy</option>
+                            <option value="Red">Red</option>
+                            <option value="Black">Black</option>
+                        </select>
+                    </div>
+
+                    <div class="field-item">
+                        <label for="crop_type">Crop Type</label>
+                        <select id="crop_type" name="crop_type" required>
+                            <option value="" selected disabled>Select crop type</option>
+                            <option value="Pulses">Pulses</option>
+                            <option value="Tobacco">Tobacco</option>
+                            <option value="Wheat">Wheat</option>
+                            <option value="Paddy">Paddy</option>
+                            <option value="Oil seeds">Oil seeds</option>
+                            <option value="Maize">Maize</option>
+                            <option value="Cotton">Cotton</option>
+                            <option value="Vegetables">Vegetables</option>
+                            <option value="Sugarcane">Sugarcane</option>
+                            <option value="Millets">Millets</option>
+
+                        </select>
+                    </div>
+
+                    <div class="field-item">
+                        <label for="temperature">Temperature (°C)</label>
+                        <input type="number" id="temperature" name="temperature" step="any" min="0" required>
+                    </div>
+
+                    <div class="field-item">
+                        <label for="n">Nitrogen (N) <small style="display:block;color:#6b7280;font-weight:600;">Range: 0 – 1400 kg/ha</small></label>
+                        <input type="number" id="n" name="n" step="any" min="0" max="1400" required>
+                    </div>
+                    <div class="field-item">
+                        <label for="p">Phosphorus (P) <small style="display:block;color:#6b7280;font-weight:600;">Range: 0 – 150 kg/ha</small></label>
+                        <input type="number" id="p" name="p" step="any" min="0" max="150" required>
+                    </div>
+                    <div class="field-item">
+                        <label for="k">Potassium (K) <small style="display:block;color:#6b7280;font-weight:600;">Range: 0 – 1000 kg/ha</small></label>
+                        <input type="number" id="k" name="k" step="any" min="0" max="1000" required>
+                    </div>
+                    <div class="field-item">
+                        <label for="ph">pH <small style="display:block;color:#6b7280;font-weight:600;">Range: 0 – 14</small></label>
+                        <input type="number" id="ph" name="ph" step="any" min="0" max="14" required>
+                    </div>
+
+                    <div class="field-item">
+                        <label for="oc">Organic Carbon (OC) <small style="display:block;color:#6b7280;font-weight:600;">Range: 0 – 5 %</small></label>
+                        <input type="number" id="oc" name="oc" step="any" min="0" max="5" required>
+                    </div>
+
+                    <div class="field-item">
+                        <label for="zn">Zinc (Zn) <small style="display:block;color:#6b7280;font-weight:600;">Range: 0 – 10 ppm</small></label>
+                        <input type="number" id="zn" name="zn" step="any" min="0" max="10" required>
+                    </div>
+                    <div class="field-item">
+                        <label for="fe">Iron (Fe) <small style="display:block;color:#6b7280;font-weight:600;">Range: 0 – 50 ppm</small></label>
+                        <input type="number" id="fe" name="fe" step="any" min="0" max="50" required>
+                    </div>
+
+                    <div class="field-item">
+                        <label for="mn">Manganese (Mn) <small style="display:block;color:#6b7280;font-weight:600;">Range: 0 – 20 ppm</small></label>
+                        <input type="number" id="mn" name="mn" step="any" min="0" max="20" required>
+                    </div>
+
+                </div>
                 </div>
 
                 <div class="analysis-actions">
@@ -455,6 +514,11 @@
                 <div class="report-header">
                     <h2><i class="fas fa-clipboard-list"></i> Detailed Soil Report</h2>
                 </div>
+
+                
+
+            
+
 
                 <div class="score-card">
                     <div class="score-circle" id="overallScore">--</div>
@@ -500,14 +564,34 @@
         analysisForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Validate all values are positive
-            const fields = ['n','p','k','ph','ec','oc','s','zn','fe','cu','mn','b'];
+            // Validate all numeric soil values are positive
+            const fields = ['n','p','k','ph','oc','zn','fe','mn','temperature'];
+            const maxMap = {
+                n: 1400,
+                p: 150,
+                k: 1000,
+                ph: 14,
+                oc: 5,
+                zn: 10,
+                fe: 50,
+                mn: 20
+            };
+
             for (const f of fields) {
                 const el = document.getElementById(f);
                 const val = parseFloat(el.value);
+                const maxVal = maxMap[f];
+
                 if (isNaN(val) || val < 0) {
                     resultBox.className = 'result-box show not-fertile';
-                    resultBox.innerHTML = `<strong>Invalid input:</strong> ${f.toUpperCase()} must be a positive number (0 or greater).`;
+                    resultBox.innerHTML = `<strong>Invalid input:</strong> ${f.toUpperCase()} must be a positive number.`;
+                    el.focus();
+                    return;
+                }
+
+                if (maxVal !== undefined && val > maxVal) {
+                    resultBox.className = 'result-box show not-fertile';
+                    resultBox.innerHTML = `<strong>Out of range:</strong> ${f.toUpperCase()} must be between 0 and ${maxVal}.`;
                     el.focus();
                     return;
                 }
@@ -530,6 +614,9 @@
 
             try {
                 const predictData = { ...values };
+                // Soil fertility model only needs numeric nutrients; extra fields are ignored by backend.
+                // Fertilizer prediction is handled separately on /fertilizer-predict.
+
                 if (userEmail) predictData.email = userEmail;
 
                 const response = await fetch('http://127.0.0.1:5000/predict', {
@@ -604,10 +691,19 @@
             generateReportBtn.innerHTML = '<span class="spinner"></span> Generating...';
 
             try {
+                // Backend /report expects FEATURES:
+                // ['n','p','k','ph','ec','oc','s','zn','fe','cu','mn','b']
+                // analysis.html form provides: n, p, k, ph, oc, zn, fe, mn, temperature (+ soil_type/crop_type)
+                // so we must add missing ec, s, cu, b.
                 const reportData = { ...lastAnalysisData };
+                reportData.ec = reportData.ec ?? 0;
+                reportData.s = reportData.s ?? 0;
+                reportData.cu = reportData.cu ?? 0;
+                reportData.b = reportData.b ?? 0;
                 if (userEmail) reportData.email = userEmail;
 
                 const response = await fetch('http://127.0.0.1:5000/report', {
+
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(reportData)
@@ -619,8 +715,37 @@
                     throw new Error(report.error || 'Report generation failed');
                 }
 
+                // Also fetch fertilizer recommendations and merge into the same UI render.
+                // /fertilizer-predict returns: top_recommendations, ph_advice, stage_advice, organic_note
+                const fertilizerResponse = await fetch('http://127.0.0.1:5000/fertilizer-predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        soil_type: lastAnalysisData.soil_type,
+                        crop_type: lastAnalysisData.crop_type,
+                        temperature: parseFloat(lastAnalysisData.temperature ?? 25),
+                        humidity: 50,
+                        moisture: 40,
+                        // keep compatibility with backend docs; model uses subset.
+                        nitrogen: lastAnalysisData.n,
+                        phosphorus: lastAnalysisData.p,
+                        potassium: lastAnalysisData.k,
+                        soil_ph: lastAnalysisData.ph,
+                        growth_stage: '',
+                        preference: '',
+                        email: userEmail || ''
+                    })
+                });
+
+                const fertData = await fertilizerResponse.json();
+
+                if (fertData && fertData.success) {
+                    report.fertilizer_prediction = fertData;
+                }
+
                 renderReport(report);
                 reportSection.classList.add('show');
+
                 reportSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             } catch (err) {
@@ -631,7 +756,10 @@
             }
         });
 
+
+
         function renderReport(report) {
+
             // Save report data for dashboard
             localStorage.setItem('lastReportData', JSON.stringify(report));
 
@@ -766,6 +894,40 @@
             // Recommendations
             const recList = document.getElementById('recommendationsList');
             recList.innerHTML = '<h3><i class="fas fa-lightbulb"></i> Recommendations to Improve Soil</h3>';
+
+            // Fertilizer recommendation embedded into same report (no separate section)
+            const fertBlock = report.fertilizer_prediction;
+            if (fertBlock && fertBlock.success && Array.isArray(fertBlock.top_recommendations)) {
+                recList.innerHTML += '<div style="margin-top:1.25rem; height:1px; background:#e5e7eb; margin-bottom:1.25rem;"></div>';
+                recList.innerHTML += '<h3 style="margin-top:0; margin-bottom:0.8rem;"><i class="fas fa-seedling"></i> Fertilizer Recommendation</h3>';
+
+                fertBlock.top_recommendations.slice(0, 3).forEach((r, idx) => {
+                    const badge = r.name ? r.name : 'Recommended Fertilizer';
+                    const conf = (typeof r.confidence === 'number') ? r.confidence : '';
+                    recList.innerHTML += `
+                        <div class="rec-card ${idx === 0 ? 'warning' : ''}">
+                            <div class="rec-card-header">
+                                <strong>${badge}</strong>
+                                ${conf !== '' ? `<span class="rec-card-status warning">Score: ${conf}</span>` : ''}
+                            </div>
+                            <p>${r.description || ''}</p>
+                        </div>
+                    `;
+                });
+
+                if (fertBlock.ph_advice || fertBlock.stage_advice || fertBlock.organic_note) {
+                    if (fertBlock.ph_advice) {
+                        recList.innerHTML += `<div class="guide-tip" style="margin-top:0.75rem"><strong>pH Advice:</strong> ${fertBlock.ph_advice}</div>`;
+                    }
+                    if (fertBlock.stage_advice) {
+                        recList.innerHTML += `<div class="guide-tip"><strong>Growth Stage:</strong> ${fertBlock.stage_advice}</div>`;
+                    }
+                    if (fertBlock.organic_note) {
+                        recList.innerHTML += `<div class="guide-tip"><strong>Organic Supplement:</strong> ${fertBlock.organic_note}</div>`;
+                    }
+                }
+            }
+
 
             const issues = report.issues.sort((a, b) => {
                 if (a.severity === 'critical' && b.severity !== 'critical') return -1;
